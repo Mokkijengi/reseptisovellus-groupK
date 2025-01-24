@@ -22,7 +22,7 @@ app.set("views", __dirname + "/views");
     // Use the API routes
     app.use("/api", recipeRoutes(db));
 
-    // Define view routes
+    // View routes
     app.get("/", (req, res) => {
       res.render("pages/home", { title: "Home" });
     });
@@ -31,7 +31,7 @@ app.set("views", __dirname + "/views");
       res.render("pages/resepti", { title: "Reseptit", resepti: {} });
     });
 
-    // Start the server
+    // Tämän vosi ehkä toiseen tiedostoon?
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
