@@ -1,0 +1,150 @@
+/* Login (index) page styles, special buttons in index.html, popup form */
+/*
+COLORS_____________________
+
+white | #fcf6dd
+light yellow | #fbeeb9
+yellow | #fadd79
+orange | #dc8b3a
+brown | #412f2b
+____________________________
+*/
+
+/* Login form styling */
+.login-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fbeeb9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-form label {
+    font-size: 14px;
+    color: #412f2b;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 2px solid #412f2b;
+    border-radius: 5px;
+    box-sizing: border-box; /* includes padding and border to both width and height to both */
+}
+
+.login-form .login-button {
+    background-color: #fadd79;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #412f2b;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.login-form .login-button:hover {
+    background-color: #dc8b3a;
+}
+
+.login-form input:hover {
+    border-color: #412f2b;
+    box-shadow: #412f2b;
+    
+}
+
+.container h2 {
+    text-align: center; /* Centers the heading text */
+    margin: 20px 0; /* Optional: Adjusts vertical spacing */
+    color: #412f2b; /* Keeps the color consistent with the theme */
+}
+
+/* Forgot Password Link */
+.index-link {
+    color: #412f2b; /* Brown color matching the site theme */
+    font-size: 14px;
+    text-decoration: none; /* Remove underline */
+    display: block;
+    text-align: center; /* Center the link */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.index-link:hover {
+    color: #dc8b3a; /* Orange on hover */
+}
+
+/* popup styling */
+/* Forgot Password Popup */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /*background-color: #412f2b; /* Dim background */
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Ensure it's above other content */
+}
+
+.popup-content {
+    background-color: #fbeeb9; /* Light yellow background */
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #412f2b; /* Brown border */
+    box-shadow: 0 8px 16px #412f2b; /* Add a brown shadow */
+    width: 300px;
+    text-align: center;
+    position: relative;
+    box-shadow: #412f2b;
+}
+
+.popup-content .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #412f2b; /* Brown */
+}
+
+.popup-content form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.popup-content .popup-button {
+    background-color: #fadd79; /* Yellow */
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #412f2b; /* Brown */
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.popup-content .popup-button:hover {
+    background-color: #dc8b3a; /* Orange */
+}
+
+
+
+
+
+
+
+

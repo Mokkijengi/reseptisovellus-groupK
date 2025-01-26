@@ -1,0 +1,83 @@
+/* Recipe Page Styles, search bar, and recipe cards */
+/* Container for search bar and button */
+.search-container {
+    display: flex; /* Align items in a row */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    margin-left: 20px; /* left margin */
+    margin-right: 20px; /* right margin */
+    gap: 10px; /* Add space between the input and button */ 
+}
+
+/* Search Bar */
+#recipe-search-bar {
+    width: 60%; /* Set the width of the search bar */
+    max-width: 500px;
+    padding: 12px;
+    border-radius: 10px; /* Round left corners */
+    border: 2px solid #412f2b;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#recipe-search-bar:focus,
+#recipe-search-bar:hover {
+    border-color: #412f2b;
+    box-shadow: 0 0 5px #412f2b;
+}
+
+/*
+#userSiteButton {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #fadd79;
+    border: none;
+    border-radius: 5px;
+    color: #412f2b;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+*/
+
+#userSiteButton {
+    margin-left: auto; /* Pushes it to the far right */
+    padding: 10px
+}
+
+/* Individual Recipe Card */
+.recipe {
+    background-color: #fcf6dd; /* White background */
+    border-radius: 10px;
+    box-shadow: #412f2b;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recipe:hover {
+    transform: translateY(-5px);
+    box-shadow: #412f2b;
+}
+
+.recipe img {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid #fadd79;
+}
+
+.recipe h2 {
+    font-size: 18px;
+    margin: 10px 0 5px;
+    color: #412f2b;
+    font-weight: bold;
+}
+
+.recipe p {
+    font-size: 14px;
+    color: #dc8b3a;
+    margin: 0 0 10px;
+    font-style: italic;
+}

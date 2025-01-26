@@ -1,0 +1,81 @@
+/* General site styles, colors, top and logo headers */
+
+/*
+COLORS_____________________
+
+white | #fcf6dd
+light yellow | #fbeeb9
+yellow | #fadd79
+orange | #dc8b3a
+brown | #412f2b
+____________________________
+*/
+
+
+html, body { /*body means text+other elements similar, not background*/
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    color: #412f2b;
+    
+}
+
+/* Global background */
+body {
+    background-color: #fadd79; /* Main site yellow */
+    color: #412f2b; /* Brown text */
+}
+
+/* Upmost light yellow header */
+.global-top-header {
+    background-color: #fbeeb9; /* Light yellow */
+    color: #412f2b; /* Brown text */
+    text-align: center;
+    font-size: 16px;
+    padding: 5px 0;
+    font-weight: bold;
+    border-bottom: 2px solid #412f2b;
+}
+
+/* Second header with brown background */
+.global-logo-header {
+    background-color: #412f2b; /* Brown background */
+    text-align: center;
+    padding: 5px 0;
+}
+
+.global-logo-header img {
+    max-width: 300px; /* Adjust width as needed */
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Center the image horizontally */
+    margin: 0 auto; /* Center the image inside the header */
+}
+
+.main-header {
+    background-color: #fbeeb9; /* Light yellow */
+    color: #412f2b; /* Brown text */
+    text-align: center;
+    font-size: 16px;
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+/* Buttons */
+.button {
+    background-color: #fadd79;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #412f2b;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #dc8b3a;
+}
+
+
