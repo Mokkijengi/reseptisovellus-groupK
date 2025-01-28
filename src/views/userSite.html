@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - NOM Bytes</title>
+    <link rel="stylesheet" href="css/userSitestyle.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/recipesPageStyle.css">
+    <script src="js/userSiteScript.js" defer></script>
+</head>
+<body>
+    <header id="global-header"></header>
+    <header class="main-header">
+        <div class="search-container">
+            <input
+                type="text"
+                id="recipe-search-bar"
+                placeholder="Search with ingredient or tag..."
+                oninput="filterRecipes()"
+            >
+            <button class="button" id="searchButton" onclick="searchNow()">Search Now</button>
+            
+            <button class="button hidden" id="userSiteButton"  onclick="goToUserSite()">User site</button>
+            <button class="button" id="logouthButton" onclick="logUserOut()">Log out</button> <!-- must be changed position next to user site button-->
+        </div>
+    </header>
+   
+<script>
+    /*
+    Jos tämän laittaa, saadaan myös SEARCH BAR! tänne voisi laittaa myös logout napin!
+    <header class="main-header">
+        <div class="search-container">
+            <input
+                type="text"
+                id="recipe-search-bar"
+                placeholder="Search with ingredient or tag..."
+                oninput="filterRecipes()"
+            >
+            <button class="button" id="searchButton" onclick="searchNow()">Search Now</button>
+            <button class="button hidden" id="userSiteButton"  onclick="goToUserSite()">User site</button>
+        </div>
+    </header>
+    */
+</script>
+    
+    <main>
+        <div class="container">
+            <div class="user-info">
+                <img src="assets\logo\teppo.jpg" alt="User Profile Image" class="profile-pic">
+                <h2>TepChef</h2>
+                <p><strong>Teppo Tiainen</strong></p>
+                <p>tep.tiai@gmail.com</p>
+                <button class="button">Edit</button>
+            </div>
+            
+            <div class="own-recipes">
+                <h3>Own Recipes</h3>
+                <table>
+                    <thead>
+
+                    </thead>
+
+                    <tbody id="own-recipes-table">
+                        <!-- Rows will be generated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="favorite-recipes">
+                <h3>Favourite Recipes</h3>
+                <table>
+                    <thead>
+                        <tr>
+
+                        </tr>
+                    </thead>
+                    <tbody id="favorite-recipes-table">
+                        <!-- Rows will be generated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </main>
+    <script src="userSiteScript.js"></script>
+</body>
+</html>

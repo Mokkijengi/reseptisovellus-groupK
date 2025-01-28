@@ -32,7 +32,7 @@ window.onload = () => {
 // Navigate to User Site
 function goToUserSite() {
     alert("Navigating to your recipes...");
-    window.location.href = "/user-dashboard.html"; // Replace with the correct URL
+    window.location.href = "/userSite.html"; // Replace with the correct URL
 }
 
 // Filter Recipes Based on Search Input
