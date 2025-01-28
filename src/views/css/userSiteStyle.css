@@ -1,0 +1,91 @@
+/*
+COLORS_____________________
+
+white | #fbeeb9
+light yellow | #fbeeb9
+yellow | #fadd79
+orange | #dc8b3a
+brown | #412f2b
+____________________________
+*/
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 20px;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.user-info {
+    background-color: #fbeeb9;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-pic {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%; /* THIS MAKES PROFILE PIC OUND! */
+    margin-bottom: 10px;
+}
+
+.recipes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+}
+
+.favorite-recipes, .own-recipes {
+    background-color: #fbeeb9; /* Global white for consistency */
+    padding: 15px;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto; /*scroll jos liikaa reseptejä*/
+
+    scrollbar-color: #412f2b #fbeeb9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    /*border-bottom: 1px solid #ccc;*/
+}
+
+th {
+    background-color: #fbeeb9; /* Light yellow */
+    color: #412f2b; /* Brown text */
+    font-weight: bold;
+}
+
+td {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 300px; /* Limit the text to 25 characters */
+}
+
+td a {
+    color: #412f2b;
+    text-decoration: none;
+}
+
+td button {
+    margin-left: 5px;
+}
+
+
