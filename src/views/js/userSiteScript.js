@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error loading global header:", error));
 });
 
-
+//filling the table with data, later fetch from server
 document.addEventListener("DOMContentLoaded", () => {
     const favoriteTable = document.getElementById("favorite-recipes-table");
     const ownTable = document.getElementById("own-recipes-table");
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         recipes.forEach((recipe, index) => {
             const row = document.createElement("tr");
 
-            // Recipe Name Cell
+            //cell for recipe name
             const recipeCell = document.createElement("td");
             const link = document.createElement("a");
             link.href = "#";
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             recipeCell.appendChild(link);
             row.appendChild(recipeCell);
 
-            // Actions Cell
+            //actions (edit, delete) cell
             const actionsCell = document.createElement("td");
 
             const editButton = document.createElement("button");
@@ -64,16 +64,17 @@ document.addEventListener("DOMContentLoaded", () => {
             tableElement.appendChild(row);
         });
 
-        // Add scrollable functionality if more than 7 items
+        //if more than 7 items, set max height and add scroll
         if (recipes.length > 7) {
-            tableElement.parentElement.style.maxHeight = "300px"; // Adjust height to fit 7 items
+            tableElement.parentElement.style.maxHeight = "300px"; //after 7 items, set max height to 300px
             tableElement.parentElement.style.overflowY = "scroll";
-        } else {
+        } else { //else remove max height and scroll if under 7
             tableElement.parentElement.style.maxHeight = "";
             tableElement.parentElement.style.overflowY = "";
         }
     }
 
+     
     function editRecipe(index, isOwn) {
         const recipeList = isOwn ? ownRecipes : favoriteRecipes;
         alert(`Editing recipe: ${recipeList[index]}`);
