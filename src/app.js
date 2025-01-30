@@ -1,23 +1,17 @@
-const express = require("express");
-const mysql = require("mysql2/promise");
-require("dotenv").config();
+const dotenv = require("dotenv");
 const resepti = require("./routes/resepti");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
+const express = require("express");
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 
 // Use recipe routes
 app.use("/resepti", resepti);
-app.use("/arvostelut", arvostelut);
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
 
 // Middleware
 app.use(bodyParser.json());
@@ -84,7 +78,8 @@ app.post("/send-reset-email", async (req, res) => {
   }
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`Server running on http://localhost:${PORT}`)
+);

@@ -1,6 +1,9 @@
 //TÄNNE KAIKKI RESEPTEJÄ KOSKEVAT ROUTET ELI GET, POST, PUT JA DELETE
 
-const { executeSQL } = require("../utils/dbHelper"); // Use executeSQL
+const express = require("express");
+const { executeSQL } = require("../utils/SQLTools"); // Use executeSQL
+
+const app = express();
 
 app.get("/test-recipes", async (req, res) => {
   try {
@@ -11,3 +14,5 @@ app.get("/test-recipes", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch recipes!" });
   }
 });
+
+module.exports = app;
