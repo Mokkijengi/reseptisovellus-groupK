@@ -1,0 +1,36 @@
+#recipe-details {
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    color: #412f2b;
+}
+
+#recipe-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#recipe-header img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+#recipe-ingredients, #recipe-instructions {
+    margin: 20px 0;
+    background-color: #fcf6dd;
+    border: 1px solid #dc8b3a;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+ul, ol {
+    margin-left: 20px;
+}
+
+.recipe-author {
+    font-style: italic;
+    color: #dc8b3a;
+    margin-top: 5px;
+    text-align: center;
+}
