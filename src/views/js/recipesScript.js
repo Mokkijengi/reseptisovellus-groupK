@@ -50,3 +50,9 @@ function filterRecipes() {
         }
     });
 }
+
+// Navigate to Recipedetails
+function navigateToRecipe(recipeName) {
+    // Ohjaa käyttäjä oikealle reseptisivulle
+    window.location.href = `/recipe.html?name=${recipeName}`;
+}
