@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NomBytes - Recipes</title>
+    <link rel="stylesheet" href="css/recipesPageStyle.css">
+    <script src="js/recipesScript.js" defer></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/recipesQuickviewStyle.css">
+    <link rel="stylesheet" href="css/MainpageStyle.css">
+    <link rel="stylesheet" href="css/recipeStyle.css">
+</head>
+<body>
+    <header id="global-header"></header>
+
+    <header class="main-header">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input
+                type="text"
+                id="recipe-search-bar"
+                placeholder="Search with ingredient or tag..."
+                oninput="filterRecipes()"
+            >
+            <button class="button" id="searchButton" onclick="searchNow()">Search Now</button>
+            <button class="button hidden" id="userSiteButton"  onclick="goToUserSite()">User site</button>
+        </div>
+        <!-- User Dashboard Button (visible only when logged in) -->
+        
+    </header>
+
+    <main>
+        <section id="recipe-list">
+          
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+/* recipe quick view (by clicking card), viewing not yet complete */
+/* Recipe List Container */
+#recipe-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid */
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+    background-color: #fbeeb9; /* Light yellow background */
+}
+
+/* Individual Recipe Card */
+.recipe {
+    background-color: #fcf6dd; /* White background */
+    border-radius: 10px;
+    box-shadow: #412f2b; /* Subtle shadow for depth */
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover Effect */
+.recipe:hover {
+    transform: translateY(-5px); /* Slight lift */
+    box-shadow: #412f2b; /* Enhanced shadow on hover */
+}
+
+/* Recipe Image */
+.recipe img {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid #fadd79; /* Yellow divider below the image */
+}
+
+/* Recipe Title */
+.recipe h2 {
+    font-size: 18px;
+    margin: 10px 0 5px;
+    color: #412f2b; /* Brown for text */
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+}
+
+/* Recipe Author */
+.recipe p {
+    font-size: 14px;
+    color: #dc8b3a; /* Orange for secondary text */
+    margin: 0 0 10px;
+    font-style: italic;
+}
+
+/* Quick View Button */
+.recipe .quick-view-btn {
+    display: inline-block;
+    background-color: #fadd79; /* Yellow button */
+    color: #412f2b; /* Brown text */
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 10px; /* Space below the button */
+}
+
+.recipe .quick-view-btn:hover {
+    background-color: #dc8b3a; /* Orange hover effect */
+}
