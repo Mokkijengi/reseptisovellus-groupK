@@ -12,6 +12,7 @@ app.use(express.json());
 
 // Use recipe routes
 app.use("/resepti", resepti);
+app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
