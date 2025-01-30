@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nom Bytes - Dual Headers</title>
+    <link rel="stylesheet" href="css/indexStyle.css">
+    <link rel="stylesheet" href="css/global.css">
+    <script src="js/indexScript.js"></script>
+    
+</head>
+<body>
+
+    <header id="global-header"></header> <!-- Empty header for the logo, loaded with JS from headers.html -->
+    
+    <div class="container">
+        <h2>Welcome to modern<br>
+        internet’s most nerdy cooking site!</h2>
+        <form class="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <button type="submit" class="login-button">Log In</button>
+
+            <button type="button" class="login-button">New User</button>
+
+            <a href="#" class="index-link" onclick="openForgotPasswordPopup()">Forgot your password?</a>
+
+            <a href="#" class="index-link" onclick="basicUserSite()">See the NOM's without logging in.</a>
+        </form>
+    </div>
+</body>
+</html>
+
+<!-- open popup for forgotten password -->
+<!-- Forgot Password Link -->
+
+
+<!-- Forgot Password Popup -->
+<div id="forgotPasswordPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeForgotPasswordPopup()">&times;</span>
+        <h3>Forgot Your Password?</h3>
+        <p>Enter your email address to receive a password reset link:</p>
+        <form onsubmit="sendResetEmail(event)">
+            <input type="email" id="resetEmail" placeholder="Enter your email" required>
+            <button type="submit" class="popup-button">Send Link</button>
+        </form>
+    </div>
+</div>
+
+<!-- Use page without logging in -->
+
+
+<!-- TEE TÄSSÄ JÄRJESTYKSESSÄ -->
+<!-- npm init -y sarver.js kohdassa luo package.json-->
+ <!-- npm install express nodemailer body-parser cors dotenv -->
+  <!-- luodaan package.json, ja asennetaan sinne-->
+   <!-- TÄRKEÄ! ÄLÄ PUSHAA, VANA LUO .gitignore JONNE TULEE node_modules JA SEN ALLE .env-->
+    <!-- node_modules on suuri, ja package luo sen itse-->
+   <!-- muista npm install jos tarvis -->
