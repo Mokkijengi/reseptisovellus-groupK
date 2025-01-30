@@ -1,42 +1,17 @@
 const express = require("express");
-const dotenv = require("dotenv");
-const connectToDatabase = require("./config/db");
-const recipeRoutes = require("./routes/recipeRoutes");
+const mysql = require("mysql2/promise");
+require("dotenv").config();
+const db = require("./yhteys"); // Move the DB connection to a separate file
+const recipesRoutes = require("./routes/recipes");
 
-dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware for parsing JSON
 app.use(express.json());
 
-// Ejs toimii kuin html mutta pystyy käyttämään js:ää
-app.set("view engine", "ejs");
-app.set("views", __dirname + "/views");
+// Use recipe routes
+app.use("/resepti", resepti);
 
-// Initialize the database and start the server
-(async () => {
-  try {
-    const db = await connectToDatabase();
-
-    // Use the API routes
-    app.use("/api", recipeRoutes(db));
-
-    // View routes
-    app.get("/", (req, res) => {
-      res.render("pages/home", { title: "Home" });
-    });
-
-    app.get("/recipe/:id", (req, res) => {
-      res.render("pages/resepti", { title: "Reseptit", resepti: {} });
-    });
-
-    // Tämän vosi ehkä toiseen tiedostoon?
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error("Error starting the application:", err);
-    process.exit(1);
-  }
-})();
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`Server running on http://localhost:${PORT}`)
+);
