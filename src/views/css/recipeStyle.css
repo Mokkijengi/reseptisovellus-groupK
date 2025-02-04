@@ -34,3 +34,57 @@ ul, ol {
     margin-top: 5px;
     text-align: center;
 }
+
+#star-rating {
+    text-align: center;
+    margin: 10px 0;
+}
+
+#star-rating .star {
+    font-size: 30px;
+    color: #fbeeb9; /* Vaaleankeltainen */
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+#star-rating .star:hover,
+#star-rating .star.selected {
+    color: #dc8b3a; /* Oranssi */
+}
+
+#back-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #fadd79; /* Sama väri kuin sivun yleisilmeessä */
+    border: 1px solid #dc8b3a;
+    color: #412f2b;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#back-button:hover {
+    background-color: #dc8b3a; /* Tumma oranssi hover-efekti */
+    color: #fcf6dd; /* Vaaleampi teksti hover-tilassa */
+}
+
+#favoriteButton {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #fadd79;
+    border: none;
+    border-radius: 5px;
+    color: #412f2b;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#favoriteButton:hover {
+    background-color: #dc8b3a;
+}

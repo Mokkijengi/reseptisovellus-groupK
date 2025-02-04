@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
             title: "Spaghetti Carbonara",
             image: "images/spaghetti.jpg",
             description: "A classic Italian pasta dish made with eggs, cheese, pancetta, and pepper.",
-            author: "Chef John", // Tekijän nimi
+            author: "Chef John",
             ingredients: [
                 "200g spaghetti",
                 "100g pancetta",
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
             title: "Fresh Salad",
             image: "images/salad.jpg",
             description: "A refreshing mix of greens, veggies, and a light vinaigrette.",
-            author: "Healthy Chef", // Tekijän nimi
+            author: "Healthy Chef",
             ingredients: [
                 "1 head lettuce",
                 "1 cucumber",
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
             title: "Fluffy Pancakes",
             image: "images/pancakes.jpg",
             description: "Delicious fluffy pancakes perfect for breakfast or brunch.",
-            author: "Pancake Lover", // Tekijän nimi
+            author: "Pancake Lover",
             ingredients: [
                 "200g all-purpose flour",
                 "2 tbsp sugar",
@@ -106,4 +106,35 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         document.body.innerHTML = "<h1>Recipe not found!</h1>";
     }
+
+    // Tähti-arvostelu
+    const stars = document.querySelectorAll("#star-rating .star");
+    stars.forEach(star => {
+        star.addEventListener("click", function () {
+            const rating = this.getAttribute("data-value");
+            stars.forEach(s => s.classList.remove("selected"));
+            for (let i = 0; i < rating; i++) {
+                stars[i].classList.add("selected");
+            }
+            alert(`You rated this recipe ${rating} stars!`);
+        });
+    });
+
+    // Suosikki-nappula
+    const favoriteButton = document.getElementById("favoriteButton");
+    const favoriteMessage = document.getElementById("favoriteMessage");
+    favoriteButton.addEventListener("click", function () {
+        // Tallennetaan suosikki localStorageen
+        const params = new URLSearchParams(window.location.search);
+        const recipeName = params.get("name");
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        if (!favorites.includes(recipeName)) {
+            favorites.push(recipeName);
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+            favoriteMessage.style.display = "block";
+            setTimeout(() => (favoriteMessage.style.display = "none"), 2000);
+        } else {
+            alert("This recipe is already in your favorites!");
+        }
+    });
 });
