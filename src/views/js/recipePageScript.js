@@ -18,8 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 /*HEADERS END */
 
-// Example of user login check (for now, simulate logged-in state)
-const isLoggedIn = true; // Replace with actual login check
+const isLoggedIn = false; // Replace with actual login check
 
 window.onload = () => {
   const userSiteButton = document.getElementById("userSiteButton");
@@ -31,14 +30,13 @@ window.onload = () => {
 // Navigate to User Site
 function goToUserSite() {
   alert("Navigating to your recipes...");
-  window.location.href = "/userSite.html"; // Replace with the correct URL
+  window.location.href = "/userPage.html"; // Replace with the correct URL
 }
 
 function filterRecipes() {
   const searchBar = document.getElementById("recipe-search-bar");
   const filter = searchBar.value.toLowerCase();
   const recipes = document.querySelectorAll(".recipe");
-
   recipes.forEach((recipe) => {
     const title = recipe.querySelector("h2").textContent.toLowerCase();
     recipe.style.display = title.includes(filter) ? "block" : "none";
@@ -47,7 +45,7 @@ function filterRecipes() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const response = await fetch("/resepti/test-recipes");
+    const response = await fetch("/recipeRoute/recipes");
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -80,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       article.appendChild(img);
       article.appendChild(title);
       article.appendChild(author);
-
+      article.addEventListener("click", () => navigateToRecipe(recipe.id));
       recipeList.appendChild(article);
     });
   } catch (error) {
@@ -88,8 +86,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// Navigate to Recipedetails
-function navigateToRecipe(recipeName) {
-  // Ohjaa käyttäjä oikealle reseptisivulle
-  window.location.href = `/recipe.html?name=${recipeName}`;
+function navigateToRecipe(recipeId) {
+  window.location.href = `/singleRecipe.html?id=${recipeId}`;
 }

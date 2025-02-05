@@ -1,11 +1,11 @@
 //TÄNNE KAIKKI Arvosteluja KOSKEVAT ROUTET ELI GET, POST, PUT JA DELETE
 
-import express from "express";
-import { executeSQL } from "../utils/SQLTools"; // Use executeSQL
+const express = require("express");
+const { executeSQL } = require("../utils/SqlTools");
 
 const app = express();
 
-app.get("/reviews", async (req, res) => {
+router.get("/reviews", async (req, res) => {
   try {
     const [rows] = await executeSQL("SELECT * FROM reviews");
     res.json(rows);

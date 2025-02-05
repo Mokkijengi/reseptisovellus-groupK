@@ -1,4 +1,5 @@
-const db = require("../yhteys"); // Import database connection
+const db = require("../db");
+//Import database connection
 
 // Generic function to execute SQL queries
 const executeSQL = async (query, params = []) => {
