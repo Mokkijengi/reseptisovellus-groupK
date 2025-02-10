@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .catch((error) => console.error("Error loading global header:", error));
+
 });
 
 function openLoginPopup() {

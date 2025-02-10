@@ -5,7 +5,7 @@ const express = require("express");
 const app = express();
 app.use("/recipeRoute", require("./routes/recipeRoute"));
 //app.use("/userRoute", require("./routes/userRoute"));
-app.use("/emailRoute", require("./routes/emailRoute"));
+//app.use("/emailRoute", require("./routes/emailRoute"));
 //app.use("/reviewRoute", require("./routes/reviewRoute"));
 dotenv.config();
 

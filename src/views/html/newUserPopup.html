@@ -1,0 +1,25 @@
+<!-- new user popup -->
+<div id="newUserPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeNewUserPopup()">&times;</span>
+        <h3>Create a New Account</h3>
+        <form id="newUserForm" onsubmit="registerNewUser(event)">
+            <label for="newUsername">Username:</label>
+            <input type="text" id="newUsername" name="newUsername" required>
+            
+            <label for="newEmail">Email:</label>
+            <input type="email" id="newEmail" name="newEmail" required>
+            
+            <label for="newFullName">Full Name:</label>
+            <input type="text" id="newFullName" name="newFullName" required>
+            
+            <label for="newPassword">Password:</label>
+            <input type="password" id="newPassword" name="newPassword" required>
+
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+            
+            <button type="submit" class="popup-button">Register</button>
+        </form>
+    </div>
+</div>
