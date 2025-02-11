@@ -10,8 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "dcryptjs": "^1.0.5",
     "dotenv": "^16.4.7",
     "dotnet": "^1.1.4",
     "ejs": "^3.1.10",
@@ -19,6 +22,5 @@
     "mysql2": "^3.12.0",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9"
-
   }
 }

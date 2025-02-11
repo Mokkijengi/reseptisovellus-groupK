@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.text())
         .then(data => {
             document.getElementById("newUserPopupContainer").innerHTML = data;
+            console.log("New User Popup loaded successfully.");
 
             document.getElementById("newUserForm").addEventListener("submit", registerNewUser);
         })
@@ -20,7 +21,7 @@ function closeNewUserPopup() {
 }
 
 //handles new user registration form submit
-function registerNewUser(event) {
+async function registerNewUser(event) { //async so we can use await to get the response
     event.preventDefault(); // Prevent form submission (page reload)
 
     let fullName = document.getElementById("newFullName").value;
@@ -47,14 +48,11 @@ function registerNewUser(event) {
 
     console.log("New User Registration:", newUser); //for debugging
 
-    /*
     try {
-        const response = await fetch("/api/register", { // Adjust API route
+        const response = await fetch("http://localhost:3000/userRoute/register", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newUser),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newUser)
         });
 
         const result = await response.json();
@@ -68,6 +66,4 @@ function registerNewUser(event) {
         console.error("Error registering user:", error);
         alert("An error occurred while registering.");
     }
-        */
-    //.catch(error => console.error("Error registering user:", error));
 }

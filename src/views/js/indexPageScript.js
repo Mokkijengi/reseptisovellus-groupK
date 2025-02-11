@@ -26,6 +26,23 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch((error) => console.error("Error loading global header:", error));
 
+    fetch("html/newUserPopup.html") // Adjust path if needed
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("newUserPopupContainer").innerHTML = data;
+
+            setTimeout(() => {
+                let form = document.getElementById("newUserForm");
+                if (form) {
+                    form.addEventListener("submit", registerNewUser);
+                } else {
+                    console.error("Error: newUserForm not found.");
+                }
+            }, 100); // Small delay to ensure form is loaded
+        })
+        .catch(error => console.error("Error loading newUserPopup.html:", error));
+
+
 });
 
 function openLoginPopup() {
@@ -44,7 +61,7 @@ function newUser() {
 document
   .getElementById("loginForm")
   .addEventListener("submit", function (event) {
-    event.preventDefault();
+    //event.preventDefault();
     alert("Login form submitted!");
     closeLoginPopup();
   });

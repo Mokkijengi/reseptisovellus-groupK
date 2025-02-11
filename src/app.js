@@ -2,9 +2,12 @@ const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
-const app = express();
+const app = express(); //siirretty kaiken varalta 11.2. AINO
+app.use(express.json());
 app.use("/recipeRoute", require("./routes/recipeRoute"));
-//app.use("/userRoute", require("./routes/userRoute"));
+
+app.use("/userRoute", require("./routes/userRoute")); //TARVITAAN UUDEN KÄYTTÄJÄN LUOMISEEN MUUTETTU 11.2. AINO
+
 //app.use("/emailRoute", require("./routes/emailRoute"));
 //app.use("/reviewRoute", require("./routes/reviewRoute"));
 dotenv.config();
