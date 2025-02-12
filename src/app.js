@@ -3,9 +3,11 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
 const app = express();
+const path = require("path");
+
 app.use("/recipeRoute", require("./routes/recipeRoute"));
 //app.use("/userRoute", require("./routes/userRoute"));
-app.use("/emailRoute", require("./routes/emailRoute"));
+//app.use("/emailRoute", require("./routes/emailRoute"));
 //app.use("/reviewRoute", require("./routes/reviewRoute"));
 dotenv.config();
 
@@ -15,6 +17,16 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + "/views"));
 
+// Serve Static Files from the 'utils' directory
+app.use("/src/utils", express.static(path.join(__dirname, "utils")));
+app.use(
+  "/src/utils/Modal",
+  express.static(path.join(__dirname, "utils/Modal"))
+);
+app.use(
+  "/src/utils/Modal/modalStyle.css",
+  express.static(path.join(__dirname, "utils/Modal/modalStyle.css"))
+);
 // Serve Static Files from the 'views' directory
 app.use("/assets", express.static(__dirname + "/views/assets"));
 app.use("/css", express.static(__dirname + "/views/css"));
