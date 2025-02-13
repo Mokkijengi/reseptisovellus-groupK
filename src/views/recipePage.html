@@ -6,10 +6,12 @@
     <title>NomBytes - Recipes</title>
     <link rel="stylesheet" href="css/recipesPageStyle.css">
     <script src="js/recipePageScript.js" defer></script>
+    <script src="/src/utils/Modal/modal.js"> defer</script>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/recipesQuickviewStyle.css">
     <link rel="stylesheet" href="css/MainpageStyle.css">
     <link rel="stylesheet" href="css/recipeStyle.css">
+    <link rel="stylesheet" href="/src/utils/Modal/modalStyle.css">
 </head>
 <body>
     <header id="global-header"></header>
@@ -25,6 +27,7 @@
             >
             <button class="button" id="searchButton" onclick="searchNow()">Search Now</button>
             <button class="button hidden" id="userSiteButton"  onclick="goToUserSite()">User site</button>
+            <button class="button" id="openModal">Add Recipe</button> <!-- 🆕 Add Recipe Button -->
         </div>
         <!-- User Dashboard Button (visible only when logged in) -->
         
@@ -37,5 +40,9 @@
               
         </section>
     </main>
+
+    <!-- Modal for Adding Recipes -->
+    <custom-modal id="customModal"></custom-modal>
+
 </body>
 </html>

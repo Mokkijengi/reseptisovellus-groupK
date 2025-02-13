@@ -89,3 +89,73 @@ document.addEventListener("DOMContentLoaded", async () => {
 function navigateToRecipe(recipeId) {
   window.location.href = `/singleRecipe.html?id=${recipeId}`;
 }
+
+// Open modal when clicking "Add Recipe"
+document.getElementById("openModal").addEventListener("click", () => {
+  const modal = document.getElementById("customModal");
+  modal.show("Add New Recipe", generateRecipeForm());
+});
+
+// Generate dynamic form for adding a new recipe
+function generateRecipeForm() {
+  return `
+        <form id="recipeForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+            
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author" required>
+            
+            <label for="ingredients">Ingredients:</label>
+            <textarea id="ingredients" name="ingredients" required></textarea>
+            
+            <label for="instructions">Instructions:</label>
+            <textarea id="instructions" name="instructions" required></textarea>
+            
+            <label for="image_url">Image URL:</label>
+            <input type="text" id="image_url" name="image_url">
+            
+            <label for="keywords">Keywords (comma separated):</label>
+            <input type="text" id="keywords" name="keywords">
+            
+            <button type="submit" class="button">Submit</button>
+        </form>
+    `;
+}
+
+// Handle form submission to add a new recipe
+document.addEventListener("submit", async function (event) {
+  if (event.target.id === "recipeForm") {
+    event.preventDefault();
+
+    const formData = {
+      title: document.getElementById("title").value,
+      author_id: document.getElementById("author").value,
+      ingredients: document.getElementById("ingredients").value,
+      instructions: document.getElementById("instructions").value,
+      image_url: document.getElementById("image_url").value || "images/default.jpg",
+      keywords: document.getElementById("keywords").value,
+      is_private: false,
+    };
+
+    try {
+      const response = await fetch("/recipeRoute/recipes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert("Recipe added successfully!");
+        location.reload(); // Reload page to show the new recipe
+      } else {
+        const errorData = await response.json();
+        alert("Error: " + errorData.error);
+      }
+    } catch (error) {
+      console.error("Error submitting recipe:", error);
+    }
+  }
+});
