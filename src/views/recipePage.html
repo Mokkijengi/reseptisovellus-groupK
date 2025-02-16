@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="css/recipesPageStyle.css">
     <script src="js/recipePageScript.js" defer></script>
     <link rel="stylesheet" href="css/global.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+
     <link rel="stylesheet" href="css/recipesQuickviewStyle.css">
     <link rel="stylesheet" href="css/MainpageStyle.css">
     <link rel="stylesheet" href="css/recipeStyle.css">
@@ -24,6 +27,12 @@
                 oninput="filterRecipes()"
             >
             <button class="button" id="searchButton" onclick="searchNow()">Search Now</button>
+
+            <!-- tokenbutton only visible for admin for now, testing -->
+            <button id="tokenButton" class="button" style="display: none">Token Button</button>
+            <button id="logoutButton" class="button" style="display: none;">Logout</button>
+
+
             <button class="button hidden" id="userSiteButton"  onclick="goToUserSite()">User site</button>
         </div>
         <!-- User Dashboard Button (visible only when logged in) -->

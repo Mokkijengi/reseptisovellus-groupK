@@ -8,6 +8,9 @@ const path = require("path"); //liittyy Modal-komponenttiin
 
 app.use(express.json());
 
+app.use('/protected', require('./routes/protectedRoute'));//tokenin tarkistus, lisätty 16.2. AINO
+
+
 app.use("/recipeRoute", require("./routes/recipeRoute"));
 
 app.use("/userRoute", require("./routes/userRoute")); //TARVITAAN UUDEN KÄYTTÄJÄN LUOMISEEN MUUTETTU 11.2. AINO
