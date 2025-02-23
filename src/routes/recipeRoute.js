@@ -40,50 +40,54 @@ router.get("/recipe/:id", async (req, res) => {
   }
 });
 
-// Lisää uusi resepti vaaditaan kaikki rivit/tiedot
+// Lisää uusi resepti, pakolliset kentät: author_id, title, ingredients, instructions
 router.post("/recipes", async (req, res) => {
-  const {
+  const { author_id, title, ingredients, instructions, image_url, keywords, is_private } = req.body;
+
+  console.log("Received new recipe:", req.body); // Debug-loki
+
+  // Tarkistetaan, että pakolliset kentät ovat mukana
+  if (!author_id || !title || !ingredients || !instructions) {
+    console.error("Error: Missing required fields");
+    return res.status(400).json({ error: "Author ID, title, ingredients, and instructions are required!" });
+  }
+
+  // Asetetaan oletusarvot valinnaisille kentille, jos niitä ei ole annettu
+  const finalImageUrl = image_url || null; // Voi olla NULL
+  const finalKeywords = keywords || null; // Voi olla NULL
+  const finalIsPrivate = is_private !== undefined ? is_private : 0; // Oletus julkinen (0)
+
+  console.log("Inserting with values:", {
     author_id,
     title,
     ingredients,
     instructions,
-    image_url,
-    keywords,
-    is_private,
-  } = req.body;
-
-  if (!title || !ingredients || !instructions) {
-    return res
-      .status(400)
-      .json({ error: "Title, ingredients, and instructions are required!" });
-  }
+    finalImageUrl,
+    finalKeywords,
+    finalIsPrivate,
+  });
 
   try {
     const [result] = await executeSQL(
       "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [
-        author_id,
-        title,
-        ingredients,
-        instructions,
-        image_url,
-        keywords,
-        is_private,
-      ]
+      [author_id, title, ingredients, instructions, finalImageUrl, finalKeywords, finalIsPrivate]
     );
+
+    console.log("Recipe added successfully:", result);
     res.status(201).json({ success: true, id: result.insertId });
   } catch (err) {
-    console.error(err);
+    console.error("Database error:", err);
     res.status(500).json({ error: "Failed to create recipe!" });
   }
 });
 
+
 // Muokkaa reseptiä yksittäisten rivien muokkaus mahdollista
 router.put("/recipes/:id", async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const updates = req.body || {}; // Estetään undefined-virhe
 
-  if (Object.keys(updates).length === 0) {
+  if (!updates || Object.keys(updates).length === 0) {
     return res.status(400).json({ error: "No fields to update!" });
   }
 
@@ -108,6 +112,7 @@ router.put("/recipes/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update recipe!" });
   }
 });
+
 
 // Poista resepti
 router.delete("/recipes/:id", async (req, res) => {
