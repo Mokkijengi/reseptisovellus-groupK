@@ -5,6 +5,8 @@ const db = require('../db'); //excisting database connection
 const { executeSQL } = require('../utils/SqlTools'); //sql tools from utils
 const bcrypt = require('bcryptjs'); //bcrypt for hashing passwords, need to install npm bcrypjs
 
+const jwt = require('jsonwebtoken'); //jwt for token to check if user is logged in
+
 //function to register a new user
 const registerUser = async (req, res) => {
     try {
@@ -49,4 +51,53 @@ const registerUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser };
+//function to login a user
+const loginUser = async (req, res) => {
+    try {
+      const { username, password } = req.body;
+  
+      // check any missing fields
+      if (!username || !password) {
+        return res.status(400).json({ success: false, message: "Missing fields" });
+      }
+  
+      // query wiht only username to check if user exists
+      const sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
+      const [rows] = await db.query(sql, [username]);
+  
+      if (rows.length === 0) {
+        return res.status(401).json({ success: false, message: "Invalid credentials" });
+      }
+  
+      const user = rows[0];
+  
+      // compare plain text password with hashed password from database
+      const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
+      if (!isPasswordCorrect) {
+        return res.status(401).json({ success: false, message: "Invalid credentials" });
+      }
+
+      const token = jwt.sign(
+        {
+            //userId: user.user_id,
+            userId: user.id,
+            username: user.username,
+            role: user.user_role //tässä vai muualla tarkistus?
+        },
+        process.env.JWT_SECRET, //secret key .env tiedostosta
+        //{ expiresIn: "1h" }
+        //testaukseen 1min
+        { expiresIn: "1m" } //ei toimi?
+      )
+
+      //console.log("JWT Secret:", process.env.JWT_SECRET);
+  
+      //if ok, login and move to recipe page
+      res.status(200).json({ success: true, message: "Login successful", token });
+    } catch (error) {
+      console.error("Error logging in user:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  };
+
+module.exports = { registerUser, loginUser }; //export the functions
