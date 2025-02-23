@@ -8,8 +8,7 @@ const path = require("path"); //liittyy Modal-komponenttiin
 
 app.use(express.json());
 
-app.use('/protected', require('./routes/protectedRoute'));//tokenin tarkistus, lisätty 16.2. AINO
-
+app.use("/protected", require("./routes/protectedRoute")); //tokenin tarkistus, lisätty 16.2. AINO
 
 app.use("/recipeRoute", require("./routes/recipeRoute"));
 
@@ -24,6 +23,16 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
+// Serve Static Files from the 'utils' directory
+app.use("/src/utils", express.static(path.join(__dirname, "utils")));
+app.use(
+  "/src/utils/Modal",
+  express.static(path.join(__dirname, "utils/Modal"))
+);
+app.use(
+  "/src/utils/Modal/modalStyle.css",
+  express.static(path.join(__dirname, "utils/Modal/modalStyle.css"))
+);
 // Varmistetaan, että staattiset tiedostot löytyvät
 app.use(express.static("views"));
 app.use("/assets", express.static(__dirname + "/views/assets"));
