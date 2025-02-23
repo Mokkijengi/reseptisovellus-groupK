@@ -143,6 +143,12 @@ function generateRecipeForm() {
             
             <label for="keywords">Keywords (comma separated):</label>
             <input type="text" id="keywords" name="keywords">
+
+            <label for="is_private">Private Recipe:</label>
+            <label class="switch">
+                <input type="checkbox" id="is_private">
+                <span class="slider round"></span>
+            </label>
             
             <button type="submit" class="button">Submit</button>
         </form>
@@ -161,7 +167,7 @@ document.addEventListener("submit", async function (event) {
       instructions: document.getElementById("instructions").value,
       image_url: document.getElementById("image_url").value || "images/default.jpg",
       keywords: document.getElementById("keywords").value,
-      is_private: false,
+      is_private: document.getElementById("is_private").checked ? 1 : 0,
     };
 
     try {
