@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="css/indexStyle.css">
     <link rel="stylesheet" href="css/global.css">
     <script src="js/indexPageScript.js"></script>
+    <script src="js/newUserPopup.js"></script>
+
     
 </head>
 <body>
@@ -23,7 +25,7 @@
             <input type="password" id="password" name="password" placeholder="Enter your password" required>
             <button type="submit" class="login-button">Log In</button>
 
-            <button type="button" class="login-button">New User</button>
+            <button type="button" class="login-button" onclick="openNewUserPopup()">New User</button>
 
             <a href="#" class="index-link" onclick="openForgotPasswordPopup()">Forgot your password?</a>
 
@@ -50,13 +52,14 @@
     </div>
 </div>
 
+<!-- new user popup -->
+<div id="newUserPopupContainer"></div>
+
+
 <!-- Use page without logging in -->
 
 
-<!-- TEE TÄSSÄ JÄRJESTYKSESSÄ -->
-<!-- npm init -y sarver.js kohdassa luo package.json-->
- <!-- npm install express nodemailer body-parser cors dotenv -->
-  <!-- luodaan package.json, ja asennetaan sinne-->
+
    <!-- TÄRKEÄ! ÄLÄ PUSHAA, VANA LUO .gitignore JONNE TULEE node_modules JA SEN ALLE .env-->
     <!-- node_modules on suuri, ja package luo sen itse-->
    <!-- muista npm install jos tarvis -->

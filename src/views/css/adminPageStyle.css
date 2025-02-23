@@ -1,0 +1,74 @@
+/*
+COLORS_____________________
+
+white | #fbeeb9
+light yellow | #fbeeb9
+yellow | #fadd79
+orange | #dc8b3a
+brown | #412f2b
+____________________________
+*/
+
+.admin-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background-color: #fbeeb9;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-content-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.admin-content-left, .admin-content-right {
+    background-color: #fbeeb9;
+    padding: 15px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+h1, h2 {
+    color: #412f2b;
+}
+
+.button {
+    background-color: #dc8b3a;
+    color: #fbeeb9;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #fadd79;
+}
+
+#global-header, .main-header {
+    background-color: #412f2b;
+    color: #fbeeb9;
+    padding: 10px;
+    text-align: center;
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
