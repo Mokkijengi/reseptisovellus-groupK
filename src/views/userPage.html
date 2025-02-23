@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - NOM Bytes</title>
+    <script src="/src/utils/Modal/modal.js"> defer</script>
     <link rel="stylesheet" href="css/userSitestyle.css">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/recipesPageStyle.css">
+    <link rel="stylesheet" href="/src/utils/Modal/modalStyle.css">
     <script src="js/userPageScript.js" defer></script>
+    
 </head>
 <body>
     <header id="global-header"></header>
@@ -56,10 +59,13 @@
             
             <div class="own-recipes">
                 <h3>Own Recipes</h3>
+                <button class="button" id="openModal">Add Recipe</button> <!-- 🆕 Add Recipe Button -->
                 <table>
                     <thead>
 
                     </thead>
+
+                    <button id="add-recipe-btn" class="button">+ Add Recipe</button>
 
                     <tbody id="own-recipes-table">
                         <!-- Rows will be generated here -->
@@ -83,6 +89,9 @@
             
         </div>
     </main>
+
+    <!-- Modal for Adding Recipes -->
+    <custom-modal id="customModal"></custom-modal>
     <script src="userSiteScript.js"></script>
 </body>
 </html>
