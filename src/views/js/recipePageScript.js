@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const decoded = JSON.parse(payloadJson);
       console.log("Decoded token:", decoded);
 
-      // Show the token button only if the role is "admin"
+      // Show the token button only if the role is "admin"! 
       if (decoded.role === "admin") {
         tokenButton.style.display = "block";
       } else {
