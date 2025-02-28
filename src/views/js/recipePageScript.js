@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch((error) => console.error("Error loading global header:", error));
 
-    // TOKEN TEST
+  // TOKEN TEST
   // DEBUG TOKEN -> näytä devtoolssissa
   const token = localStorage.getItem("token");
   console.log("Token in localStorage:", token);
@@ -26,12 +26,12 @@ document.addEventListener("DOMContentLoaded", function () {
   if (token && tokenButton) {
     try {
       // Decode the payload (the second part of the JWT)
-      const payloadBase64 = token.split('.')[1];
+      const payloadBase64 = token.split(".")[1];
       const payloadJson = atob(payloadBase64);
       const decoded = JSON.parse(payloadJson);
       console.log("Decoded token:", decoded);
 
-      // Show the token button only if the role is "admin"! 
+      // Show the token button only if the role is "admin"!
       if (decoded.role === "admin") {
         tokenButton.style.display = "block";
       } else {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
   //LOGOUT
   //const token = localStorage.getItem("token");
   const logoutButton = document.getElementById("logoutButton");
-  
+
   if (token) {
     logoutButton.style.display = "block";
   } else {
@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 */
 
-
 const isLoggedIn = false; // Replace with actual login check
 
 window.onload = () => {
@@ -87,7 +86,7 @@ window.onload = () => {
 
 // Navigate to User Site
 function goToUserSite() {
-  alert("Navigating to your recipes...");
+  alert("Navigating to user site...");
   window.location.href = "/userPage.html"; // Replace with the correct URL
 }
 
@@ -98,7 +97,6 @@ document.getElementById("logoutButton").addEventListener("click", () => {
   //to login page when log out
   window.location.href = "/"; // or your login page
 });
-
 
 function filterRecipes() {
   const searchBar = document.getElementById("recipe-search-bar");

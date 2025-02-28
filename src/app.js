@@ -39,9 +39,6 @@ app.use("/assets", express.static(__dirname + "/views/assets"));
 app.use("/css", express.static(__dirname + "/views/css"));
 app.use("/js", express.static(__dirname + "/views/js"));
 
-// Reitit
-app.use("/recipeRoute", require("./routes/recipeRoute"));
-//app.use("/userRoute", require("./routes/userRoute"));
 //app.use("/emailRoute", require("./routes/emailRoute"));
 //app.use("/reviewRoute", require("./routes/reviewRoute"));
 
@@ -58,7 +55,9 @@ app.get("/singleRecipePage.html", (req, res) => {
 app.get("/userPage.html", (req, res) => {
   res.sendFile(__dirname + "/views/userPage.html");
 });
-
+app.get("/adminPage.html", (req, res) => {
+  res.sendFile(__dirname + "/views/userPage.html");
+});
 // Käynnistetään palvelin
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>

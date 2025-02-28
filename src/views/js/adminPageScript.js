@@ -111,68 +111,71 @@ document.getElementById("openUserModal").addEventListener("click", async () => {
     console.error("Error fetching users:", error);
   }
 });
+let allRecipes = []; // Määritellään globaali muuttuja
 
 document
   .getElementById("openRecipeModal")
   .addEventListener("click", async () => {
-    // Get the custom modal and show it with title and body
     const modal = document.getElementById("recipeModal");
     modal.show(recipeModalContent.title, recipeModalContent.body);
 
-    // Fetch and display recipes
     try {
       const recipesResponse = await fetch("/recipeRoute/recipes");
       if (!recipesResponse.ok) {
         throw new Error(`HTTP error! Status: ${recipesResponse.status}`);
       }
 
-      const recipes = await recipesResponse.json();
-      console.log("Fetched recipes:", recipes); // Debug
+      allRecipes = await recipesResponse.json(); // Tallenna data globaalisti
+      console.log("Fetched recipes:", allRecipes); // Debug
 
-      if (!Array.isArray(recipes)) {
+      if (!Array.isArray(allRecipes)) {
         throw new Error("Invalid response format: expected an array");
       }
 
-      const recipesTable = document.getElementById("recipes-table");
-      recipesTable.innerHTML = `
-        <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Actions</th>
-        </tr>
-      `; // Reset table headers
-
-      recipes.forEach((recipe) => {
-        const row = document.createElement("tr");
-
-        const titleCell = document.createElement("td");
-        titleCell.textContent = recipe.title;
-        row.appendChild(titleCell);
-
-        const authorCell = document.createElement("td");
-        authorCell.textContent = recipe.author;
-        row.appendChild(authorCell);
-
-        const actionsCell = document.createElement("td");
-        const editButton = document.createElement("button");
-        editButton.textContent = "Edit";
-        editButton.classList.add("button");
-        editButton.onclick = () => editRecipe(recipe.id);
-        actionsCell.appendChild(editButton);
-
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
-        deleteButton.classList.add("button");
-        deleteButton.onclick = () => deleteRecipe(recipe.id);
-        actionsCell.appendChild(deleteButton);
-
-        row.appendChild(actionsCell);
-        recipesTable.appendChild(row);
-      });
+      populateRecipesTable(); // Uusi funktio taulukon täyttämiseen
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }
   });
+
+function populateRecipesTable() {
+  const recipesTable = document.getElementById("recipes-table");
+  recipesTable.innerHTML = `
+    <tr>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Actions</th>
+    </tr>
+  `;
+
+  allRecipes.forEach((recipe, index) => {
+    const row = document.createElement("tr");
+
+    const titleCell = document.createElement("td");
+    titleCell.textContent = recipe.title;
+    row.appendChild(titleCell);
+
+    const authorCell = document.createElement("td");
+    authorCell.textContent = recipe.author;
+    row.appendChild(authorCell);
+
+    const actionsCell = document.createElement("td");
+    const editButton = document.createElement("button");
+    editButton.textContent = "Edit";
+    editButton.classList.add("button");
+    editButton.onclick = () => editRecipe(index);
+    actionsCell.appendChild(editButton);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("button", "delete-btn");
+    deleteButton.textContent = "Delete";
+    deleteButton.onclick = () => deleteRecipe(index);
+    actionsCell.appendChild(deleteButton);
+
+    row.appendChild(actionsCell);
+    recipesTable.appendChild(row);
+  });
+}
 
 document.addEventListener("DOMContentLoaded", async function () {
   try {
@@ -242,17 +245,77 @@ function deleteUser(userId) {
   }
 }
 
-function editRecipe(recipeId) {
-  alert(`Editing recipe with ID: ${recipeId}`);
-  // Implement edit recipe functionality
+//Muokkaus
+function editRecipe(index) {
+  const recipe = allRecipes[index];
+
+  const newTitle = prompt("Enter new title:", recipe.title);
+  const newIngredients = prompt("Enter new ingredients:", recipe.ingredients);
+  const newInstructions = prompt(
+    "Enter new instructions:",
+    recipe.instructions
+  );
+
+  if (!newTitle || !newIngredients || !newInstructions) {
+    alert("All fields must be filled!");
+    return;
+  }
+
+  fetch(`/recipeRoute/recipes/${recipe.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: newTitle,
+      ingredients: newIngredients,
+      instructions: newInstructions,
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to update recipe");
+      }
+      return response.json();
+    })
+    .then(() => {
+      alert("Recipe updated successfully!");
+      allRecipes[index].title = newTitle;
+      allRecipes[index].ingredients = newIngredients;
+      allRecipes[index].instructions = newInstructions;
+      refreshTables();
+    })
+    .catch((error) => console.error("Error updating recipe:", error));
 }
 
-function deleteRecipe(recipeId) {
+//Poisto
+function deleteRecipe(index) {
+  const recipe = allRecipes[index]; // Käytetään allRecipes-taulukkoa
+
   const confirmDelete = confirm(
-    `Are you sure you want to delete recipe with ID: ${recipeId}?`
+    `Are you sure you want to delete recipe: ${recipe.title}?`
   );
+
   if (confirmDelete) {
-    alert(`Deleting recipe with ID: ${recipeId}`);
-    // Implement delete recipe functionality
+    fetch(`/recipeRoute/recipes/${recipe.id}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete recipe");
+        }
+        return response.json();
+      })
+      .then(() => {
+        alert("Recipe deleted successfully!");
+        allRecipes.splice(index, 1); // Poistetaan resepti oikeasta taulukosta
+        refreshTables();
+      })
+      .catch((error) => console.error("Error deleting recipe:", error));
   }
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/index.html";
 }
