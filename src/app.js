@@ -14,7 +14,10 @@ app.use("/recipeRoute", require("./routes/recipeRoute"));
 
 app.use("/userRoute", require("./routes/userRoute")); //TARVITAAN UUDEN KÄYTTÄJÄN LUOMISEEN MUUTETTU 11.2. AINO
 
-//app.use("/emailRoute", require("./routes/emailRoute"));
+//app.use("/emailRoute", require("./routes/emailRoute")); //KOKEILU 7.3. AINO
+const emailRoutes = require("./routes/emailRoute"); // ✅ Ensure the path is correct
+app.use("/email", emailRoutes); // ✅ This enables the email API
+
 //app.use("/reviewRoute", require("./routes/reviewRoute"));
 dotenv.config();
 
@@ -58,6 +61,13 @@ app.get("/userPage.html", (req, res) => {
 app.get("/adminPage.html", (req, res) => {
   res.sendFile(__dirname + "/views/userPage.html");
 });
+
+//RESET PASSWORD
+app.get("/reset-password.html", (req, res) => {
+  res.sendFile(__dirname + "/views/resetPassword.html");
+});
+
+
 // Käynnistetään palvelin
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
