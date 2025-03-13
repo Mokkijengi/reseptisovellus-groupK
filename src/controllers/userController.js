@@ -126,4 +126,44 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getAllUsers }; //export the functions
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await executeSQL("DELETE FROM users WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found!" });
+    }
+
+    res.json({ success: true, message: "User deleted successfully!" });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "Failed to delete user!" });
+  }
+};
+
+const editUser = async (req, res) => {
+  const { id } = req.params;
+  const { username, email, role } = req.body;
+
+  try {
+    const result = await executeSQL(
+      "UPDATE users SET username = ?, email = ?, user_role = ? WHERE id = ?",
+      [username, email, role, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "User not found or no changes made!" });
+    }
+
+    res.json({ success: true, message: "User updated successfully!" });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ error: "Failed to update user!" });
+  }
+};
+
+module.exports = { registerUser, loginUser, getAllUsers, deleteUser, editUser };
