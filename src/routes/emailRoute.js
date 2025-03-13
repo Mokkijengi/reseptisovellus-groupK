@@ -10,9 +10,10 @@ const { Resend } = require('resend');
 const db = require('../db.js'); // ✅ Use the existing connection
 
 const router = express.Router();
-const resend = new Resend('re_M529Q2jK_AKfkSp216tCsxzDvH83LtMDG'); // Your API key
+const resend = new Resend('re_M529Q2jK_AKfkSp216tCsxzDvH83LtMDG'); //API KEY!
+//if we had domain, sending to multiple addresses would be easier
 
-// Function to send the reset email
+//function to send the reset email
 async function sendPasswordResetEmail(userEmail, resetLink) {
     try {
         const response = await resend.emails.send({
