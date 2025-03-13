@@ -58,21 +58,30 @@ const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ success: false, message: "Missing fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing fields" });
     }
 
     const sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
     const [rows] = await db.query(sql, [username]);
 
     if (rows.length === 0) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     const user = rows[0];
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
     if (!isPasswordCorrect) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
@@ -108,7 +117,46 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Get the logged-in user's details
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await executeSQL("DELETE FROM users WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found!" });
+    }
+
+    res.json({ success: true, message: "User deleted successfully!" });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "Failed to delete user!" });
+  }
+};
+
+const editUser = async (req, res) => {
+  const { id } = req.params;
+  const { username, email, role } = req.body;
+
+  try {
+    const result = await executeSQL(
+      "UPDATE users SET username = ?, email = ?, user_role = ? WHERE id = ?",
+      [username, email, role, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "User not found or no changes made!" });
+    }
+
+    res.json({ success: true, message: "User updated successfully!" });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ error: "Failed to update user!" });
+  }
+};
+
 const getUser = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -121,7 +169,7 @@ const getUser = async (req, res) => {
       "SELECT id, username, email, user_role FROM users WHERE id = ?",
       [userId]
     );
-    
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json(user);
@@ -137,10 +185,16 @@ const refreshToken = async (req, res) => {
   if (!oldToken) return res.status(401).json({ message: "No token provided" });
 
   try {
-    const decoded = jwt.verify(oldToken, process.env.JWT_SECRET, { ignoreExpiration: true });
+    const decoded = jwt.verify(oldToken, process.env.JWT_SECRET, {
+      ignoreExpiration: true,
+    });
 
     const newToken = jwt.sign(
-      { userId: decoded.userId, username: decoded.username, role: decoded.role },
+      {
+        userId: decoded.userId,
+        username: decoded.username,
+        role: decoded.role,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
@@ -152,4 +206,12 @@ const refreshToken = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getAllUsers, getUser, refreshToken };
+module.exports = {
+  registerUser,
+  loginUser,
+  getAllUsers,
+  deleteUser,
+  editUser,
+  getUser,
+  refreshToken,
+};
