@@ -15,7 +15,7 @@ app.use("/recipeRoute", require("./routes/recipeRoute"));
 app.use("/userRoute", require("./routes/userRoute")); //TARVITAAN UUDEN KÄYTTÄJÄN LUOMISEEN MUUTETTU 11.2. AINO
 
 //app.use("/emailRoute", require("./routes/emailRoute"));
-//app.use("/reviewRoute", require("./routes/reviewRoute"));
+app.use("/reviewRoute", require("./routes/reviewRoute"));
 dotenv.config();
 
 // Middleware

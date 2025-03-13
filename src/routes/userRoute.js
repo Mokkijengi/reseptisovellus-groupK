@@ -4,14 +4,16 @@ const {
   registerUser,
   loginUser,
   getAllUsers,
-} = require("../controllers/userController"); //import user registration from controller
+  getUser,
+  refreshToken,
+} = require("../controllers/userController"); // Import controllers
 
-const router = express.Router(); //create a new router for user routes
+const router = express.Router(); // Luo uusi reititin käyttäjäpoluille
 
-router.post("/register", registerUser); //handle registering a new user
+router.post("/register", registerUser); // Uuden käyttäjän rekisteröinti
+router.post("/login", loginUser); // Käyttäjän kirjautuminen
+router.get("/users", getAllUsers); // Hakee kaikki käyttäjät
+router.get("/user", getUser); // Hakee yksittäisen käyttäjän tiedot
+router.post("/refreshToken", refreshToken); // Tokenin uusiminen
 
-router.post("/login", loginUser); //logs user
-
-router.get("/users", getAllUsers); //get all users
-
-module.exports = router; //export the router
+module.exports = router; // Viedään reititin käyttöön

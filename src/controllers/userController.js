@@ -1,30 +1,29 @@
-//responsible for registering a new user, maybe later we can add more functionalities like modifying user data, deleting user, etc.
+// Responsible for registering a new user, logging in, and user-related operations
 
-//import db and sqltools
-const db = require("../db"); //excisting database connection
-const { executeSQL } = require("../utils/SqlTools"); //sql tools from utils
-const bcrypt = require("bcryptjs"); //bcrypt for hashing passwords, need to install npm bcrypjs
+// Import database and utilities
+const db = require("../db"); // Existing database connection
+const { executeSQL } = require("../utils/SqlTools"); // SQL tools from utils
+const bcrypt = require("bcryptjs"); // bcrypt for hashing passwords
 
-const jwt = require("jsonwebtoken"); //jwt for token to check if user is logged in
+const jwt = require("jsonwebtoken"); // JWT for authentication
 
-//function to register a new user
+// Register a new user
 const registerUser = async (req, res) => {
   try {
-    console.log("received req.body", req.body); //debugging
-    // If req.body is undefined, return an error
+    console.log("Received req.body", req.body); // Debugging
     if (!req.body || Object.keys(req.body).length === 0) {
       console.error("❌ Error: req.body is undefined or empty.");
       return res.status(400).json({ message: "Request body is missing." });
     }
 
-    const { fullName, username, email, password } = req.body; //get the data from register form in popup
+    const { fullName, username, email, password } = req.body;
 
     if (!fullName || !username || !email || !password) {
       console.error("❌ Validation Error: Missing fields");
       return res.status(400).json({ message: "All fields are required!" });
     }
 
-    //check if user already exists with email or username
+    // Check if user already exists
     const existingUser = await executeSQL(
       "SELECT * FROM users WHERE email = ? OR username = ?",
       [email, username]
@@ -36,10 +35,10 @@ const registerUser = async (req, res) => {
         .json({ message: "User already exists with same email or username." });
     }
 
-    //hash the password before storing in database
+    // Hash password before storing in database
     const hashPassword = await bcrypt.hash(password, 10);
 
-    //insert the user data into database
+    // Insert new user into database
     const insertNewUser = `
             INSERT INTO users (username, name, email, password_hash, user_role) 
             VALUES (?, ?, ?, ?, 'user')
@@ -53,57 +52,39 @@ const registerUser = async (req, res) => {
   }
 };
 
-//function to login a user
+// Login user
 const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // check any missing fields
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing fields" });
+      return res.status(400).json({ success: false, message: "Missing fields" });
     }
 
-    // query wiht only username to check if user exists
     const sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
     const [rows] = await db.query(sql, [username]);
 
     if (rows.length === 0) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const user = rows[0];
 
-    // compare plain text password with hashed password from database
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      user.password_hash
-    );
+    const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordCorrect) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
       {
-        //userId: user.user_id,
         userId: user.id,
         username: user.username,
-        role: user.user_role, //tässä vai muualla tarkistus?
+        role: user.user_role,
       },
-      process.env.JWT_SECRET, //secret key .env tiedostosta
-      //{ expiresIn: "1h" }
-      //testaukseen 1min
-      { expiresIn: "1m" } //ei toimi?
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" } // **Korjattu, aiempi "24" oli virhe**
     );
 
-    //console.log("JWT Secret:", process.env.JWT_SECRET);
-
-    //if ok, login and move to recipe page
     res.status(200).json({ success: true, message: "Login successful", token });
   } catch (error) {
     console.error("Error logging in user:", error);
@@ -111,6 +92,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Get all users (for admin use)
 const getAllUsers = async (req, res) => {
   try {
     const result = await executeSQL("SELECT * FROM users");
@@ -119,11 +101,55 @@ const getAllUsers = async (req, res) => {
       return res.status(404).json({ error: "No users found" });
     }
 
-    res.json(result); // Varmistetaan, että palautetaan taulukko
+    res.json(result);
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = { registerUser, loginUser, getAllUsers }; //export the functions
+// Get the logged-in user's details
+const getUser = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "No token provided" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const [user] = await executeSQL(
+      "SELECT id, username, email, user_role FROM users WHERE id = ?",
+      [userId]
+    );
+    
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Refresh token if expired
+const refreshToken = async (req, res) => {
+  const oldToken = req.headers.authorization?.split(" ")[1];
+  if (!oldToken) return res.status(401).json({ message: "No token provided" });
+
+  try {
+    const decoded = jwt.verify(oldToken, process.env.JWT_SECRET, { ignoreExpiration: true });
+
+    const newToken = jwt.sign(
+      { userId: decoded.userId, username: decoded.username, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    res.json({ token: newToken });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+module.exports = { registerUser, loginUser, getAllUsers, getUser, refreshToken };
