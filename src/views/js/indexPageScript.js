@@ -90,6 +90,38 @@ function handleForgotPassword(event) {
   closeForgotPasswordPopup();
 }
 
+async function sendResetEmail(event) {
+  event.preventDefault();
+  const email = document.getElementById("resetEmail").value;
+
+  if (!email) {
+    alert("Please enter your email.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/email/forgot-password", { // Corrected route
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const result = await response.json();
+
+    alert("If your email is correct, a password reset link has been sent.");
+    
+    // Close the forgot password popup after sending the request
+    closeForgotPasswordPopup();
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred while sending the email.");
+  }
+}
+
+
+/*
 //SEND TEST EMAIL FORGOT PASSWORD
 async function sendResetEmail(event) {
   event.preventDefault();
@@ -116,6 +148,7 @@ async function sendResetEmail(event) {
     alert("An error occurred while sending the email.");
   }
 }
+*/
 
 function basicUserSite() {
   alert("Taking you to the NOM's...");
