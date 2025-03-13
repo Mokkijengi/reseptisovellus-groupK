@@ -88,3 +88,33 @@ ul, ol {
 #favoriteButton:hover {
     background-color: #dc8b3a;
 }
+
+/* ⭐ ARVOSTELUKOOSTE (GRAAFINEN NÄYTTÖ) */
+#review-summary {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fcf6dd;
+    border: 1px solid #dc8b3a;
+    border-radius: 5px;
+}
+
+.review-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.review-bar {
+    flex-grow: 1;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.filled-bar {
+    height: 100%;
+    background: navy;
+}
+
