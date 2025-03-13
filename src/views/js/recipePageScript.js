@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Show the token button only if the role is "admin"!
       if (decoded.role === "admin") {
+        window.location.href = "/adminPage.html";
         tokenButton.style.display = "block";
       } else {
         tokenButton.style.display = "none";

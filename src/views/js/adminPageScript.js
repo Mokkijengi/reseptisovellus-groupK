@@ -1,3 +1,6 @@
+let allRecipes = []; // Määritellään globaali muuttuja
+let allUsers = []; // Määritellään globaali muuttuja
+
 const userModalContent = {
   title: "User Modal",
   body: `
@@ -8,7 +11,8 @@ const userModalContent = {
                 placeholder="Search users..."
                 oninput="filterUsers()"
             >
-            <button class="button" id="userSearchButton" onclick="searchUsers()">Search Now</button>
+
+
         </div>
         <div class="admin-content-left-container-content">
             <table id="users-table">
@@ -33,7 +37,6 @@ const recipeModalContent = {
                 placeholder="Search recipes..."
                 oninput="filterRecipes()"
             >
-            <button class="button" id="recipeSearchButton" onclick="searchRecipes()">Search Now</button>
         </div>
         <div class="admin-content-right-container-content">
             <table id="recipes-table">
@@ -46,6 +49,58 @@ const recipeModalContent = {
         </div>
       `,
 };
+
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    // Lataa globaalit headerit
+    const response = await fetch("global-headers.html");
+    const data = await response.text();
+    const globalHeader = document.querySelector("#global-header");
+
+    if (globalHeader) {
+      globalHeader.innerHTML = data;
+
+      // Muuttaa logon linkiksi
+      const logo = globalHeader.querySelector("img");
+      if (logo) {
+        const linkWrapper = document.createElement("a");
+        linkWrapper.href = "/users.html";
+        logo.parentNode.insertBefore(linkWrapper, logo);
+        linkWrapper.appendChild(logo);
+      }
+    } else {
+      console.error("No element with ID 'global-header' found.");
+    }
+  } catch (error) {
+    console.error("Error initializing page:", error);
+  }
+
+  // JWT-tokenin tarkistus
+  const token = localStorage.getItem("token");
+  console.log("Token in localStorage:", token);
+
+  if (token) {
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payloadJson = atob(payloadBase64);
+      const decoded = JSON.parse(payloadJson);
+      console.log("Decoded token:", decoded);
+
+      if (decoded.role === "admin") {
+        console.log("Admin detected!");
+      } else {
+        console.log("User is not admin, redirecting...");
+        window.location.href = "/index.html";
+      }
+    } catch (err) {
+      console.error("Error decoding token:", err);
+      window.location.href = "/index.html";
+    }
+  } else {
+    console.log("No token found, redirecting...");
+    window.location.href = "/index.html";
+  }
+});
 
 document.getElementById("openUserModal").addEventListener("click", async () => {
   // Get the custom modal and show it with title and body
@@ -76,7 +131,7 @@ document.getElementById("openUserModal").addEventListener("click", async () => {
         </tr>
       `; // Reset table headers
 
-    users.forEach((user) => {
+    users.forEach((user, index) => {
       const row = document.createElement("tr");
 
       const usernameCell = document.createElement("td");
@@ -95,13 +150,18 @@ document.getElementById("openUserModal").addEventListener("click", async () => {
       const editButton = document.createElement("button");
       editButton.textContent = "Edit";
       editButton.classList.add("button");
-      editButton.onclick = () => editUser(user.id);
+      editButton.onclick = () => {
+        console.log("Editing user:", user, user.id);
+        editUser(user.id);
+      };
       actionsCell.appendChild(editButton);
 
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
       deleteButton.classList.add("button");
-      deleteButton.onclick = () => deleteUser(user.id);
+      deleteButton.onclick = () => {
+        deleteUser(user.id);
+      };
       actionsCell.appendChild(deleteButton);
 
       row.appendChild(actionsCell);
@@ -111,13 +171,13 @@ document.getElementById("openUserModal").addEventListener("click", async () => {
     console.error("Error fetching users:", error);
   }
 });
-let allRecipes = []; // Määritellään globaali muuttuja
 
 document
   .getElementById("openRecipeModal")
   .addEventListener("click", async () => {
     const modal = document.getElementById("recipeModal");
     modal.show(recipeModalContent.title, recipeModalContent.body);
+    // Lataa newUserPopup.js dynaamisesti
 
     try {
       const recipesResponse = await fetch("/recipeRoute/recipes");
@@ -177,32 +237,6 @@ function populateRecipesTable() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", async function () {
-  try {
-    // Lataa globaalit headerit
-    const response = await fetch("global-headers.html");
-    const data = await response.text();
-    const globalHeader = document.querySelector("#global-header");
-
-    if (globalHeader) {
-      globalHeader.innerHTML = data;
-
-      // Muuttaa logon linkiksi
-      const logo = globalHeader.querySelector("img");
-      if (logo) {
-        const linkWrapper = document.createElement("a");
-        linkWrapper.href = "/users.html";
-        logo.parentNode.insertBefore(linkWrapper, logo);
-        linkWrapper.appendChild(logo);
-      }
-    } else {
-      console.error("No element with ID 'global-header' found.");
-    }
-  } catch (error) {
-    console.error("Error initializing page:", error);
-  }
-});
-
 // Käyttäjäfiltterin korjaus
 function filterUsers() {
   const searchBar = document.getElementById("user-search-bar");
@@ -230,19 +264,60 @@ function filterRecipes() {
   });
 }
 
-function editUser(userId) {
-  alert(`Editing user with ID: ${userId}`);
-  // Implement edit user functionality
-}
-
 function deleteUser(userId) {
   const confirmDelete = confirm(
     `Are you sure you want to delete user with ID: ${userId}?`
   );
-  if (confirmDelete) {
-    alert(`Deleting user with ID: ${userId}`);
-    // Implement delete user functionality
+  if (!confirmDelete) return;
+
+  fetch(`/userRoute/users/${userId}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+      return response.json();
+    })
+    .then(() => {
+      alert("User deleted successfully!");
+      openUserModal.click(); // Päivitetään sivu muutosten näkymiseksi
+    })
+    .catch((error) => console.error("Error deleting user:", error));
+}
+
+function editUser(userId) {
+  const newUsername = prompt("Enter new username:");
+  const newEmail = prompt("Enter new email:");
+  const newRole = prompt("Enter new role (user/admin):");
+
+  if (!newUsername || !newEmail || !newRole) {
+    alert("All fields must be filled!");
+    return;
   }
+
+  fetch(`/userRoute/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: newUsername,
+      email: newEmail,
+      role: newRole,
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to update user");
+      }
+      return response.json();
+    })
+    .then(() => {
+      alert("User updated successfully!");
+      openUserModal.click(); // Päivitetään sivu muutosten näkymiseksi
+    })
+    .catch((error) => console.error("Error updating user:", error));
 }
 
 //Muokkaus
@@ -283,7 +358,7 @@ function editRecipe(index) {
       allRecipes[index].title = newTitle;
       allRecipes[index].ingredients = newIngredients;
       allRecipes[index].instructions = newInstructions;
-      refreshTables();
+      openRecipeModal.click(); // Päivitetään sivu muutosten näkymiseksi
     })
     .catch((error) => console.error("Error updating recipe:", error));
 }
@@ -309,7 +384,7 @@ function deleteRecipe(index) {
       .then(() => {
         alert("Recipe deleted successfully!");
         allRecipes.splice(index, 1); // Poistetaan resepti oikeasta taulukosta
-        refreshTables();
+        openRecipeModal.click(); // Päivitetään sivu muutosten näkymiseksi
       })
       .catch((error) => console.error("Error deleting recipe:", error));
   }
