@@ -101,6 +101,81 @@ document.addEventListener("DOMContentLoaded", async function () {
     window.location.href = "/index.html";
   }
 });
+async function openUserDetails(userId) {
+  try {
+    const response = await fetch(`/userRoute/users/${userId}`); // Fetch user details
+    if (!response.ok) throw new Error("Failed to fetch user details");
+
+    const user = await response.json();
+
+    // Open modal with an editable form
+    document.getElementById("editUserModal").show(
+      `Edit User: ${user.username}`,
+      `
+      <form id="editUserForm">
+        <label for="editUsername">Username:</label>
+        <input type="text" id="editUsername" value="${user.username}" required>
+
+        <label for="editEmail">Email:</label>
+        <input type="email" id="editEmail" value="${user.email}" required>
+
+        <label for="editRole">Role:</label>
+        <select id="editRole">
+          <option value="user" ${
+            user.user_role === "user" ? "selected" : ""
+          }>User</option>
+          <option value="admin" ${
+            user.user_role === "admin" ? "selected" : ""
+          }>Admin</option>
+        </select>
+
+        <button type="submit">Save Changes</button>
+      </form>
+
+      <script>
+        document.getElementById("editUserForm").onsubmit = async function (event) {
+          event.preventDefault(); // Prevent page reload
+
+          const newRole = document.getElementById("editRole").value;
+
+          // If changing role to admin, ask for confirmation
+          if (newRole === "admin" && !confirm("Are you sure you want to change this user to an admin?")) {
+            return; // Stop submission if user cancels
+          }
+
+          const updatedUser = {
+            username: document.getElementById("editUsername").value,
+            email: document.getElementById("editEmail").value,
+            role: newRole,
+          };
+
+          try {
+            const updateResponse = await fetch("/userRoute/users/${userId}", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedUser),
+            });
+
+            if (!updateResponse.ok) {
+              throw new Error("Failed to update user");
+            }
+
+            alert("User updated successfully!");
+            document.getElementById("editUserModal").hide(); // Close modal
+            openUserModal.click(); // Refresh user list
+          } catch (error) {
+            console.error("Error updating user:", error);
+            alert("Failed to update user.");
+          }
+        };
+      </script>
+      `
+    );
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    alert("Failed to load user details.");
+  }
+}
 
 document.getElementById("openUserModal").addEventListener("click", async () => {
   // Get the custom modal and show it with title and body
@@ -151,8 +226,8 @@ document.getElementById("openUserModal").addEventListener("click", async () => {
       editButton.textContent = "Edit";
       editButton.classList.add("button");
       editButton.onclick = () => {
+        openUserDetails(user.id);
         console.log("Editing user:", user, user.id);
-        editUser(user.id);
       };
       actionsCell.appendChild(editButton);
 
@@ -285,39 +360,76 @@ function deleteUser(userId) {
     })
     .catch((error) => console.error("Error deleting user:", error));
 }
-
 function editUser(userId) {
-  const newUsername = prompt("Enter new username:");
-  const newEmail = prompt("Enter new email:");
-  const newRole = prompt("Enter new role (user/admin):");
-
-  if (!newUsername || !newEmail || !newRole) {
-    alert("All fields must be filled!");
+  const user = allUsers.find((user) => user.id === userId); // Find user by ID
+  if (!user) {
+    alert("User not found!");
     return;
   }
 
-  fetch(`/userRoute/users/${userId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: newUsername,
-      email: newEmail,
-      role: newRole,
-    }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to update user");
-      }
-      return response.json();
-    })
-    .then(() => {
-      alert("User updated successfully!");
-      openUserModal.click(); // Päivitetään sivu muutosten näkymiseksi
-    })
-    .catch((error) => console.error("Error updating user:", error));
+  // Get the modal element
+  const editUserModal = document.getElementById("editUserModal");
+
+  // Open the modal and set the content dynamically
+  editUserModal.show(
+    "Edit User",
+    `
+      <form id="editUserForm">
+        <label for="editUsername">Username:</label>
+        <input type="text" id="editUsername" value="${user.username}" required>
+
+        <label for="editEmail">Email:</label>
+        <input type="email" id="editEmail" value="${user.email}" required>
+
+        <label for="editRole">Role:</label>
+        <select id="editRole">
+          <option value="user" ${
+            user.user_role === "user" ? "selected" : ""
+          }>User</option>
+          <option value="admin" ${
+            user.user_role === "admin" ? "selected" : ""
+          }>Admin</option>
+        </select>
+
+        <button type="submit">Save Changes</button>
+      </form>
+
+      <script>
+        document.getElementById("editUserForm").onsubmit = async function (event) {
+          event.preventDefault(); 
+          const confirmDelete = confirm(
+    "Are you sure you want to change role to admin?"
+  );
+  if (!confirmDelete) return;
+
+          const updatedUser = {
+            username: document.getElementById("editUsername").value,
+            email: document.getElementById("editEmail").value,
+            role: document.getElementById("editRole").value,
+          };
+          
+
+          try {
+            const response = await fetch("/userRoute/users/${userId}", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedUser),
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to update user");
+            }
+
+            alert("User updated successfully!");
+            document.getElementById("editUserModal").hide(); // Close modal
+            openUserModal.click(); // Refresh user list
+          } catch (error) {
+            console.error("Error updating user:", error);
+          }
+        };
+      </script>
+    `
+  );
 }
 
 //Muokkaus
@@ -386,36 +498,12 @@ function deleteRecipe(index) {
         allRecipes.splice(index, 1); // Poistetaan resepti oikeasta taulukosta
         //   openRecipeModal.click(); // Päivitetään sivu muutosten näkymiseksi
         //location.reload();
-        window.location.href = "/adminPage.html";
+        openRecipeModal.click(); // Päivitetään sivu muutosten näkymiseksi
       })
       .catch((error) => console.error("Error deleting recipe:", error));
   }
 }
 
-////
-function deleteUser(userId) {
-  const confirmDelete = confirm(
-    `Are you sure you want to delete user with ID: ${userId}?`
-  );
-  if (!confirmDelete) return;
-
-  fetch(`/userRoute/users/${userId}`, {
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to delete user");
-      }
-      return response.json();
-    })
-    .then(() => {
-      alert("User deleted successfully!");
-      openUserModal.click(); // Päivitetään sivu muutosten näkymiseksi
-    })
-    .catch((error) => console.error("Error deleting user:", error));
-}
-
-////7
 function goToUserSite() {
   alert("Navigating to user site...");
   window.location.href = "/userPage.html"; // Replace with the correct URL

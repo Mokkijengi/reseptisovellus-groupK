@@ -8,6 +8,7 @@ const {
   refreshToken,
   deleteUser,
   editUser,
+  getSingleUser,
 } = require("../controllers/userController"); // Import controllers
 
 const router = express.Router(); // Luo uusi reititin käyttäjäpoluille
@@ -15,6 +16,7 @@ router.post("/register", registerUser); // Uuden käyttäjän rekisteröinti
 router.post("/login", loginUser); // Käyttäjän kirjautuminen
 router.get("/users", getAllUsers); // Hakee kaikki käyttäjät
 router.get("/user", getUser); // Hakee yksittäisen käyttäjän tiedot
+router.get("/users/:id", getSingleUser); // Hakee yksittäisen käyttäjän tiedot idllä
 router.post("/refreshToken", refreshToken); // Tokenin uusiminen
 
 router.post("/login", loginUser); //logs user

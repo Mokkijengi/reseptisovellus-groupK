@@ -78,7 +78,7 @@ router.post("/recipes", async (req, res) => {
   });
 
   try {
-    const [result] = await executeSQL(
+    const result = await executeSQL(
       "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         author_id,
