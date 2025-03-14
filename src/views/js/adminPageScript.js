@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const logo = globalHeader.querySelector("img");
       if (logo) {
         const linkWrapper = document.createElement("a");
-        linkWrapper.href = "/users.html";
+        linkWrapper.href = "/userPage.html";
         logo.parentNode.insertBefore(linkWrapper, logo);
         linkWrapper.appendChild(logo);
       }
@@ -384,10 +384,41 @@ function deleteRecipe(index) {
       .then(() => {
         alert("Recipe deleted successfully!");
         allRecipes.splice(index, 1); // Poistetaan resepti oikeasta taulukosta
-        openRecipeModal.click(); // Päivitetään sivu muutosten näkymiseksi
+        //   openRecipeModal.click(); // Päivitetään sivu muutosten näkymiseksi
+        //location.reload();
+        window.location.href = "/adminPage.html";
       })
       .catch((error) => console.error("Error deleting recipe:", error));
   }
+}
+
+////
+function deleteUser(userId) {
+  const confirmDelete = confirm(
+    `Are you sure you want to delete user with ID: ${userId}?`
+  );
+  if (!confirmDelete) return;
+
+  fetch(`/userRoute/users/${userId}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+      return response.json();
+    })
+    .then(() => {
+      alert("User deleted successfully!");
+      openUserModal.click(); // Päivitetään sivu muutosten näkymiseksi
+    })
+    .catch((error) => console.error("Error deleting user:", error));
+}
+
+////7
+function goToUserSite() {
+  alert("Navigating to user site...");
+  window.location.href = "/userPage.html"; // Replace with the correct URL
 }
 
 function logout() {

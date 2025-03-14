@@ -42,14 +42,24 @@ router.get("/recipe/:id", async (req, res) => {
 
 // Lisää uusi resepti, pakolliset kentät: author_id, title, ingredients, instructions
 router.post("/recipes", async (req, res) => {
-  const { author_id, title, ingredients, instructions, image_url, keywords, is_private } = req.body;
+  const {
+    author_id,
+    title,
+    ingredients,
+    instructions,
+    image_url,
+    keywords,
+    is_private,
+  } = req.body;
 
   console.log("Received new recipe:", req.body); // Debug-loki
 
   // Tarkistetaan, että pakolliset kentät ovat mukana
   if (!author_id || !title || !ingredients || !instructions) {
     console.error("Error: Missing required fields");
-    return res.status(400).json({ error: "Author ID, title, ingredients, and instructions are required!" });
+    return res.status(400).json({
+      error: "Author ID, title, ingredients, and instructions are required!",
+    });
   }
 
   // Asetetaan oletusarvot valinnaisille kentille, jos niitä ei ole annettu
@@ -70,7 +80,15 @@ router.post("/recipes", async (req, res) => {
   try {
     const [result] = await executeSQL(
       "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [author_id, title, ingredients, instructions, finalImageUrl, finalKeywords, finalIsPrivate]
+      [
+        author_id,
+        title,
+        ingredients,
+        instructions,
+        finalImageUrl,
+        finalKeywords,
+        finalIsPrivate,
+      ]
     );
 
     console.log("Recipe added successfully:", result);
@@ -80,7 +98,6 @@ router.post("/recipes", async (req, res) => {
     res.status(500).json({ error: "Failed to create recipe!" });
   }
 });
-
 
 // Muokkaa reseptiä yksittäisten rivien muokkaus mahdollista
 router.put("/recipes/:id", async (req, res) => {
@@ -97,7 +114,7 @@ router.put("/recipes/:id", async (req, res) => {
       .join(", ");
     const values = Object.values(updates);
 
-    const [result] = await executeSQL(
+    const result = await executeSQL(
       `UPDATE recipes SET ${fields} WHERE id = ?`,
       [...values, id]
     );
@@ -113,13 +130,12 @@ router.put("/recipes/:id", async (req, res) => {
   }
 });
 
-
 // Poista resepti
 router.delete("/recipes/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [result] = await executeSQL("DELETE FROM recipes WHERE id = ?", [id]);
+    const result = await executeSQL("DELETE FROM recipes WHERE id = ?", [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Recipe not found!" });
