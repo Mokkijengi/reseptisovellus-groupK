@@ -10,15 +10,16 @@ const { Resend } = require('resend');
 const db = require('../db.js'); // ✅ Use the existing connection
 
 const router = express.Router();
-const resend = new Resend('re_M529Q2jK_AKfkSp216tCsxzDvH83LtMDG'); //API KEY!
-//if we had domain, sending to multiple addresses would be easier
+//const resend = new Resend('re_M529Q2jK_AKfkSp216tCsxzDvH83LtMDG'); //API KEY!
+const resend = new Resend('re_cBdQgJKW_8fpT8iDyS97xX2QuTpzUU6JZ'); //API KEY!
+//our domain for 2025 is nom-byte.com
 
 //function to send the reset email
 async function sendPasswordResetEmail(userEmail, resetLink) {
     try {
         const response = await resend.emails.send({
-            //from: 'passwordreset.nombytes@noreply.com',
-            from: 'onboarding@resend.dev', //mock email
+            //from: 'onboarding@resend.dev', //mock email
+            from: 'no-reply@nom-byte.com', //domainn email
             to: userEmail,
             subject: 'Password Reset Request',
             html: `<p>Click <a href="${resetLink}">here</a> to reset your password to NOMBytes.</p>`,

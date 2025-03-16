@@ -118,3 +118,37 @@ ul, ol {
     background: navy;
 }
 
+#send-recipe-btn {
+
+    background-color: #fbeeb9; /* Sama väri kuin sivun yleisilmeessä */
+    border: 1px solid #dc8b3a;
+    color: #412f2b;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#send-recipe-btn:hover {
+    background-color: #dc8b3a; /* tumma oranssi hover-efekti */
+    color: #fcf6dd; /* vaaleampi teksti hover-tilassa */
+}
+#send-recipe-form input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 14px;
+    border: 2px solid #412f2b;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#send-recipe-form input:hover {
+    border-color: #412f2b;
+    box-shadow: 0 0 5px #412f2b;
+}
+
+

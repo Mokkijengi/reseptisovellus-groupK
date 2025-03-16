@@ -18,7 +18,7 @@ app.use("/userRoute", require("./routes/userRoute")); //TARVITAAN UUDEN KÄYTTÄ
 const emailRoutes = require("./routes/emailRoute"); // ✅ Ensure the path is correct
 app.use("/email", emailRoutes); // ✅ This enables the email API
 
-//app.use("/reviewRoute", require("./routes/reviewRoute"));
+app.use("/reviewRoute", require("./routes/reviewRoute"));
 dotenv.config();
 
 // Middleware

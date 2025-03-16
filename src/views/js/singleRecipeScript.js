@@ -47,6 +47,33 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.error("Error fetching recipe:", error);
     document.body.innerHTML = "<h1>Recipe not found!</h1>";
   }
+
+  //lähetä resepti kaverille emaililla
+  // Handle the Send Recipe via Email functionality
+  document.getElementById('send-recipe-form').addEventListener('submit', function(e) {
+    e.preventDefault();  // Prevent form submission
+
+    const recipientEmail = document.getElementById('email').value;
+
+    // Simple email validation
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailPattern.test(recipientEmail)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    // Get the current page URL (this should be the recipe page link)
+    const recipeLink = window.location.href;  // Automatically gets the current URL (e.g., recipe page)
+
+    const subject = 'Check out this awesome recipe!';
+    const body = `Hey! I found this awesome recipe and thought you’d like it. Here’s the link: ${recipeLink}`;
+
+    // Create the mailto link
+    const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    // Open the default email client with the pre-filled email
+    window.location.href = mailtoLink;
+  });
 });
 
 // ⭐ TÄHTI-ARVOSTELUN TALLENNUS
