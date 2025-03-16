@@ -68,7 +68,9 @@ router.post("/recipes", verifyToken, async (req, res) => {
 
   if (!author_id || !title || !ingredients || !instructions) {
     console.error("Error: Missing required fields");
-    return res.status(400).json({ error: "Author ID, title, ingredients, and instructions are required!" });
+    return res.status(400).json({
+      error: "Author ID, title, ingredients, and instructions are required!",
+    });
   }
 
   const finalImageUrl = image_url || null;
@@ -88,7 +90,15 @@ router.post("/recipes", verifyToken, async (req, res) => {
   try {
     const result = await executeSQL(
       "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [author_id, title, ingredients, instructions, finalImageUrl, finalKeywords, finalIsPrivate]
+      [
+        author_id,
+        title,
+        ingredients,
+        instructions,
+        finalImageUrl,
+        finalKeywords,
+        finalIsPrivate,
+      ]
     );
 
     console.log("Recipe added successfully:", result);
