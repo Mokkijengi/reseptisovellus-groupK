@@ -1,11 +1,24 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const ownTable = document.getElementById("own-recipes-table");
   const addRecipeButton = document.getElementById("add-recipe-btn");
-  const logoutButton = document.getElementById("logouthButton");
+  const logoutButton = document.getElementById("logoutButton");
   const modal = document.getElementById("customModal");
 
   let ownRecipes = [];
   let userId = null;
+
+  fetch("global-headers.html")
+    .then((response) => response.text())
+    .then((data) => {
+      const globalHeader = document.querySelector("#global-header");
+      if (globalHeader) {
+        globalHeader.innerHTML = data;
+      } else {
+        console.error("No element with ID 'global-header' found.");
+      }
+    })
+    .catch((error) => console.error("Error loading global header:", error));
+
 
   // Hae token localStoragesta tai sessionStoragesta
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -28,6 +41,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (logoutButton) {
     logoutButton.addEventListener("click", logout);
   }
+  if (token) {
+    logoutButton.style.display = "block";
+  } else {
+    logoutButton.style.display = "none";
+  }
+  
 
   // Haetaan kirjautuneen käyttäjän tiedot ja päivitetään userId
   async function fetchUser() {
@@ -281,3 +300,7 @@ function editRecipe(recipe) {
   addRecipeButton.addEventListener("click", addRecipe);
   await fetchUser();
 });
+
+function goToRecipePage() {
+  window.location.href = "/recipePage.html";
+}
