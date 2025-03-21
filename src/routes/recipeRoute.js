@@ -1,16 +1,20 @@
 // TÄNNE KAIKKI RESEPTEJÄ KOSKEVAT ROUTET ELI GET, POST, PUT JA DELETE
 
 const express = require("express");
+const multer = require("multer");
 const { executeSQL } = require("../utils/SqlTools");
-const verifyToken = require("../routes/protectedRoute"); // 🔹 Lisätty autentikointivarmistus
+const verifyToken = require("../routes/protectedRoute");
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Hae KAIKKI reseptit (sisältää sekä julkiset että yksityiset)
 router.get("/recipes", async (req, res) => {
   try {
     const rows = await executeSQL("SELECT * FROM recipes");
-    console.log(rows); // Log rows to inspect
+    console.log(rows);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -29,7 +33,7 @@ router.get("/recipe/:id", async (req, res) => {
       return res.status(404).json({ error: "Recipe not found!" });
     }
 
-    console.log("Found recipe:", rows[0]); // Check the recipe that is being returned
+    console.log("Found recipe:", rows[0]);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -40,7 +44,7 @@ router.get("/recipe/:id", async (req, res) => {
 // Hae kirjautuneen käyttäjän omat reseptit
 router.get("/my-recipes", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.userId; // Haetaan käyttäjän ID tokenista
+    const userId = req.user.userId;
 
     if (!userId) {
       return res.status(400).json({ error: "User ID missing in token!" });
@@ -59,33 +63,18 @@ router.get("/my-recipes", verifyToken, async (req, res) => {
   }
 });
 
-// Lisää uusi resepti, pakolliset kentät: author_id, title, ingredients, instructions
-router.post("/recipes", verifyToken, async (req, res) => {
-  const { title, ingredients, instructions, image_url, keywords, is_private } = req.body;
-  const author_id = req.user.userId; // Haetaan käyttäjä ID tokenista
 
-  console.log("Received new recipe:", req.body); // Debug-loki
+// Lisäys
+router.post("/recipes", verifyToken, upload.single("image"), async (req, res) => {
+  const { title, ingredients, instructions, keywords, is_private } = req.body;
+  const author_id = req.user.userId;
+  const image = req.file ? req.file.buffer : null;
 
   if (!author_id || !title || !ingredients || !instructions) {
-    console.error("Error: Missing required fields");
     return res.status(400).json({
       error: "Author ID, title, ingredients, and instructions are required!",
     });
   }
-
-  const finalImageUrl = image_url || null;
-  const finalKeywords = keywords || null;
-  const finalIsPrivate = is_private !== undefined ? is_private : 0;
-
-  console.log("Inserting with values:", {
-    author_id,
-    title,
-    ingredients,
-    instructions,
-    finalImageUrl,
-    finalKeywords,
-    finalIsPrivate,
-  });
 
   try {
     const result = await executeSQL(
@@ -95,13 +84,12 @@ router.post("/recipes", verifyToken, async (req, res) => {
         title,
         ingredients,
         instructions,
-        finalImageUrl,
-        finalKeywords,
-        finalIsPrivate,
+        image,
+        keywords || null,
+        is_private !== undefined ? is_private : 0,
       ]
     );
 
-    console.log("Recipe added successfully:", result);
     res.status(201).json({ success: true, id: result.insertId });
   } catch (err) {
     console.error("Database error:", err);
@@ -109,23 +97,52 @@ router.post("/recipes", verifyToken, async (req, res) => {
   }
 });
 
-// Muokkaa reseptiä yksittäisten rivien muokkaus mahdollista
-router.put("/recipes/:id", async (req, res) => {
-  const { id } = req.params;
-  const updates = req.body || {}; // Estetään undefined-virhe
 
-  if (!updates || Object.keys(updates).length === 0) {
+// Muokkaus
+router.put("/recipes/:id", verifyToken, upload.single("image"), async (req, res) => {
+  const { id } = req.params;
+  const { title, ingredients, instructions, keywords } = req.body;
+  const image = req.file ? req.file.buffer : null;
+
+  if (!title && !ingredients && !instructions && !image && !keywords) {
     return res.status(400).json({ error: "No fields to update!" });
   }
 
   try {
-    const fields = Object.keys(updates)
-      .map((key) => `${key} = ?`)
-      .join(", ");
-    const values = Object.values(updates);
+    let existingImage = null;
+    if (!image) {
+      const existing = await executeSQL("SELECT image_url FROM recipes WHERE id = ?", [id]);
+      if (existing.length > 0) {
+        existingImage = existing[0].image_url;
+      }
+    }
+
+    const fields = [];
+    const values = [];
+
+    if (title) {
+      fields.push("title = ?");
+      values.push(title);
+    }
+    if (ingredients) {
+      fields.push("ingredients = ?");
+      values.push(ingredients);
+    }
+    if (instructions) {
+      fields.push("instructions = ?");
+      values.push(instructions);
+    }
+    if (keywords !== undefined) { // Tarkistetaan, että keywords on annettu (voi olla tyhjä)
+      fields.push("keywords = ?");
+      values.push(keywords);
+    }
+    if (image || existingImage) {
+      fields.push("image_url = ?");
+      values.push(image || existingImage);
+    }
 
     const result = await executeSQL(
-      `UPDATE recipes SET ${fields} WHERE id = ?`,
+      `UPDATE recipes SET ${fields.join(", ")} WHERE id = ?`,
       [...values, id]
     );
 
@@ -139,6 +156,7 @@ router.put("/recipes/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update recipe!" });
   }
 });
+
 
 // Poista resepti
 router.delete("/recipes/:id", async (req, res) => {
@@ -155,6 +173,26 @@ router.delete("/recipes/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to delete recipe!" });
+  }
+});
+
+
+// Palauta reseptin kuva erillisenä pyyntönä
+router.get("/recipe/:id/image", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const rows = await executeSQL("SELECT image_url FROM recipes WHERE id = ?", [id]);
+
+    if (!rows || rows.length === 0 || !rows[0].image_url) {
+      return res.status(404).send("Image not found");
+    }
+
+    res.setHeader("Content-Type", "image/png");
+    res.send(rows[0].image_url);
+  } catch (err) {
+    console.error("Error fetching image:", err);
+    res.status(500).send("Failed to fetch image");
   }
 });
 
