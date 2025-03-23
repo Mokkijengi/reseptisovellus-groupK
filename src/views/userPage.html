@@ -14,17 +14,12 @@
 </head>
 <body>
     <header id="global-header"></header>
+
     <header class="main-header">
-        <div class="search-container">
-            <input
-                type="text"
-                id="recipe-search-bar"
-                placeholder="Search with ingredient or tag..."
-                oninput="filterRecipes()"
-            >
-            
-            <button class="button hidden" id="userSiteButton"  onclick="goToUserSite()">User site</button>
-            <button class="button" id="logouthButton" onclick="logUserOut()">Log out</button> <!-- must be changed position next to user site button-->
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-left: 20px;
+            margin-right: 20px;">
+            <button id="goToRecipePage" class="button" onclick="goToRecipePage()">Recipes</button>
+            <button id="logoutButton" class="button" style="display: none;">Logout</button>
         </div>
     </header>
    
