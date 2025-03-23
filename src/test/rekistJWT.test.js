@@ -2,8 +2,15 @@
 //when logging in, comparing password with hashed password in database
 //testing if jwt token is found when logging in
 
+process.env.DB_HOST = "localhost";
+process.env.DB_USER = "root";
+process.env.DB_PASSWORD = "root";
+process.env.DB_NAME = "recipedb";
+process.env.JWT_SECRET="mysecret";
+
 const request = require('supertest');
 const app = require('../app');
+
 
 describe("User registration and JWT Token Test", () => {
     const jestTestUser = {
