@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    // Haetaan tarvittavat HTML-elementit
   const ownTable = document.getElementById("own-recipes-table");
   const addRecipeButton = document.getElementById("add-recipe-btn");
   const logoutButton = document.getElementById("logoutButton");
@@ -23,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Hae token localStoragesta tai sessionStoragesta
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
+  // Jos käyttäjä ei ole kirjautunut sisään, ohjataan hänet kirjautumissivulle
   if (!token) {
     console.error("User token not found!");
     alert("You are not logged in. Please log in first.");
@@ -30,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Logout-toiminnallisuus
+  // Kirjautumisesta ulos kirjautumistoiminto
   function logout() {
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
@@ -61,10 +63,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!response.ok) throw new Error("Käyttäjän tietojen haku epäonnistui!");
 
       const userData = await response.json();
-      userId = userData.id; // Tallennetaan käyttäjän ID
+      userId = userData.id;
 
       console.log(`🔹 Kirjautunut käyttäjä: ID ${userId}, ${userData.username}`);
-      await fetchOwnRecipes(); // Haetaan käyttäjän reseptit heti kun ID saadaan
+      await fetchOwnRecipes();
     } catch (error) {
       console.error("Error fetching user:", error);
       alert("Failed to fetch user data. Please log in again.");
@@ -72,9 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  
-
-  // Haetaan vain kirjautuneen käyttäjän reseptit
+  // Haetaan käyttäjän omat reseptit palvelimelta
   async function fetchOwnRecipes() {
     try {
       if (!userId) {
@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Funktio taulukon täyttämiseen resepteillä
   function populateTable(tableElement, recipes) {
     tableElement.innerHTML = "";
     recipes.forEach((recipe, index) => {
@@ -112,6 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       recipeCell.appendChild(link);
       row.appendChild(recipeCell);
 
+  // Muokkaus- ja poistopainikkeet    
       const actionsCell = document.createElement("td");
 
       const editButton = document.createElement("button");
@@ -123,7 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const deleteButton = document.createElement("button");
       deleteButton.classList.add("button", "delete-btn");
       deleteButton.textContent = "Delete";
-      deleteButton.onclick = () => deleteRecipe(recipe, index);//------
+      deleteButton.onclick = () => deleteRecipe(recipe, index);
       actionsCell.appendChild(deleteButton);
 
       row.appendChild(actionsCell);
@@ -131,21 +133,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Avaa reseptin tarkemmat tiedot modaalissa
   async function openRecipeDetails(recipeId) {
     try {
       const response = await fetch(`/recipeRoute/recipe/${recipeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (!response.ok) throw new Error("Failed to fetch recipe details");
       const recipe = await response.json();
-
+  
+      let imageHtml = "";
+      try {
+        const timestamp = new Date().getTime();
+        const imageResponse = await fetch(`/recipeRoute/recipe/${recipeId}/image?t=${timestamp}`);
+        if (imageResponse.ok) {
+          imageHtml = `
+            <p><strong>Image:</strong><br>
+            <img src="/recipeRoute/recipe/${recipeId}/image?t=${timestamp}" 
+                 alt="Recipe Image" 
+                 style="max-width: 300px; height: auto; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);">
+            </p>`;
+        }
+      } catch (imgError) {
+        console.warn("Image not found or failed to load.");
+      }
+  
       modal.show(
         `Recipe Details: ${recipe.title}`,
         `
           <p><strong>Title:</strong> ${recipe.title}</p>
           <p><strong>Ingredients:</strong><br> ${recipe.ingredients.replace(/\n/g, "<br>")}</p>
           <p><strong>Instructions:</strong><br> ${recipe.instructions.replace(/\n/g, "<br>")}</p>
+          ${recipe.keywords ? `<p><strong>Keywords:</strong> ${recipe.keywords}</p>` : ""}
+          ${imageHtml}
           <button class="button" onclick="document.getElementById('customModal').hide()">Close</button>
         `
       );
@@ -154,8 +175,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert("Failed to load recipe details.");
     }
   }
-
-  // Korjattu lisäys (varmistettu että userId menee oikein)
+  
+  
+  // Lisäys
   function addRecipe() {
     modal.show(
       "Add New Recipe",
@@ -163,57 +185,60 @@ document.addEventListener("DOMContentLoaded", async () => {
         <form id="addRecipeForm">
           <label for="add-title">Title:</label>
           <input type="text" id="add-title" required>
-
+    
           <label for="add-ingredients">Ingredients:</label>
           <textarea id="add-ingredients" required></textarea>
-
+    
           <label for="add-instructions">Instructions:</label>
           <textarea id="add-instructions" required></textarea>
-
+    
+          <label for="add-keywords">Keywords:</label>
+          <input type="text" id="add-keywords">
+    
+          <label for="add-image">Image:</label>
+          <input type="file" id="add-image" accept="image/*">
+    
           <button type="submit" class="button">Add Recipe</button>
         </form>
       `
     );
+    
 
     document.getElementById("addRecipeForm").addEventListener("submit", async function (event) {
       event.preventDefault();
-
-      if (!userId) {
-        alert("User ID is missing. Please log in again.");
-        return;
+    
+      let formData = new FormData();
+      formData.append("title", document.getElementById("add-title").value);
+      formData.append("ingredients", document.getElementById("add-ingredients").value);
+      formData.append("instructions", document.getElementById("add-instructions").value);
+      formData.append("keywords", document.getElementById("add-keywords").value); // 🔥 Uusi avainsanakenttä
+    
+      const imageInput = document.getElementById("add-image");
+      if (imageInput.files.length > 0) {
+        formData.append("image", imageInput.files[0]);
       }
-
-      const newRecipe = {
-        author_id: userId,
-        title: document.getElementById("add-title").value,
-        ingredients: document.getElementById("add-ingredients").value,
-        instructions: document.getElementById("add-instructions").value,
-        image_url: null,
-        keywords: null,
-        is_private: 0,
-      };
-
+    
       try {
         const response = await fetch("/recipeRoute/recipes", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(newRecipe),
+          body: formData,
         });
-
+    
         if (!response.ok) throw new Error("Failed to add recipe");
-
+    
         await fetchOwnRecipes();
         setTimeout(() => modal.hide(), 500);
       } catch (error) {
         console.error("Error adding recipe:", error);
       }
     });
+    
   }
 
-//DELETE
+  // Poisto
   function deleteRecipe(recipe) {
     modal.show(
       "Confirm Delete",
@@ -223,7 +248,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <button class="button" onclick="document.getElementById('customModal').hide()">Cancel</button>
       `
     );
-  
+
     document.getElementById("confirmDelete").addEventListener("click", async function () {
       try {
         const response = await fetch(`/recipeRoute/recipes/${recipe.id}`, {
@@ -232,9 +257,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         if (!response.ok) throw new Error("Failed to delete recipe");
-  
+
         await fetchOwnRecipes();
         setTimeout(() => modal.hide(), 500);
       } catch (error) {
@@ -242,63 +267,76 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   }
+
+  // Muokkaus
+  function editRecipe(recipe) {
+    modal.show(
+      "Edit Recipe",
+      `
+        <form id="editRecipeForm">
+          <label for="edit-title">Title:</label>
+          <input type="text" id="edit-title" value="${recipe.title}" required>
   
-//EDIT
-function editRecipe(recipe) {
-  modal.show(
-    "Edit Recipe",
-    `
-      <form id="editRecipeForm">
-        <label for="edit-title">Title:</label>
-        <input type="text" id="edit-title" value="${recipe.title}" required>
+          <label for="edit-ingredients">Ingredients:</label>
+          <textarea id="edit-ingredients" required>${recipe.ingredients}</textarea>
+  
+          <label for="edit-instructions">Instructions:</label>
+          <textarea id="edit-instructions" required>${recipe.instructions}</textarea>
+  
+          <label for="edit-keywords">Keywords (comma-separated):</label>
+          <input type="text" id="edit-keywords" value="${recipe.keywords ? recipe.keywords : ''}">
+  
+          <label for="edit-image">Replace Image (optional):</label>
+          <input type="file" id="edit-image" accept="image/*">
+  
+          <button type="submit" class="button">Save Changes</button>
+        </form>
+      `
+    );
 
-        <label for="edit-ingredients">Ingredients:</label>
-        <textarea id="edit-ingredients" required>${recipe.ingredients}</textarea>
-
-        <label for="edit-instructions">Instructions:</label>
-        <textarea id="edit-instructions" required>${recipe.instructions}</textarea>
-
-        <button type="submit" class="button">Save Changes</button>
-      </form>
-    `
-  );
-
-  document.getElementById("editRecipeForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    const updatedRecipe = {
-      title: document.getElementById("edit-title").value,
-      ingredients: document.getElementById("edit-ingredients").value,
-      instructions: document.getElementById("edit-instructions").value,
-    };
-
-    try {
-      const response = await fetch(`/recipeRoute/recipes/${recipe.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedRecipe),
-      });
-
-      if (!response.ok) throw new Error("Failed to update recipe");
-
-      await fetchOwnRecipes();
-      setTimeout(() => modal.hide(), 500);
-    } catch (error) {
-      console.error("Error updating recipe:", error);
-    }
-  });
-}
-
-
+    document.getElementById("editRecipeForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+    
+      let formData = new FormData();
+      formData.append("title", document.getElementById("edit-title").value);
+      formData.append("ingredients", document.getElementById("edit-ingredients").value);
+      formData.append("instructions", document.getElementById("edit-instructions").value);
+      formData.append("keywords", document.getElementById("edit-keywords").value); // 🔥 Nyt avainsanat tallennetaan
+    
+      const imageInput = document.getElementById("edit-image");
+      if (imageInput.files.length > 0) {
+        formData.append("image", imageInput.files[0]); // Lähetetään kuva vain jos se on valittu
+      } else {
+        formData.append("image", ""); // Jos ei uutta kuvaa, lähetetään tyhjä arvo
+      }
+    
+      try {
+        const response = await fetch(`/recipeRoute/recipes/${recipe.id}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+      
+        if (!response.ok) throw new Error("Failed to update recipe");
+      
+        await fetchOwnRecipes(); // Päivitetään lista, jotta kuva vaihtuu
+        setTimeout(() => modal.hide(), 500);
+      } catch (error) {
+        console.error("Error updating recipe:", error);
+      }
+      
+    });
+    
+  }
+  // Päivitetään taulukko resepteillä
   function refreshTables() {
     populateTable(ownTable, ownRecipes);
   }
-
+  // Lisätään tapahtumakuuntelija uuden reseptin lisäämiselle
   addRecipeButton.addEventListener("click", addRecipe);
-  await fetchUser();
+  await fetchUser(); // Haetaan käyttäjän tiedot ja reseptit heti alussa
 });
 
 function goToRecipePage() {
