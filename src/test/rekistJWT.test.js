@@ -1,7 +1,6 @@
-//testing registering new user to database
+//testing registering new user to database and if duplicate
 //when logging in, comparing password with hashed password in database
 //testing if jwt token is found when logging in
-//testing if jwt token is removed when logging out
 
 const request = require('supertest');
 const app = require('../app');
