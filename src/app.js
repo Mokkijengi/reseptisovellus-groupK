@@ -67,9 +67,20 @@ app.get("/reset-password.html", (req, res) => {
   res.sendFile(__dirname + "/views/resetPassword.html");
 });
 
-
+/*
 // Käynnistetään palvelin
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
+*/
+
+//TESTAUSTA VARTEN
+// Export the app for testing
+module.exports = app;
+
+// Start the server only if not in a testing environment
+if (process.env.NODE_ENV !== "test") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+}
