@@ -127,19 +127,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     const recipeList = document.getElementById("recipe-list");
     recipeList.innerHTML = ""; // Tyhjennetään vanhat sisällöt
 
-    recipes.forEach((recipe) => {
+    recipes.forEach(async (recipe) => {
       const article = document.createElement("article");
       article.classList.add("recipe");
 
       const img = document.createElement("img");
-      img.src = recipe.image_url || "images/default.jpg"; // Oletuskuva
-      img.alt = recipe.title; // ✅ Muutettu "name" → "title"
+      img.src = "src/images/default.jpg";
+      img.alt = recipe.title;
+      img.style.maxWidth = "300px";
+      img.style.borderRadius = "10px";
+      img.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.2)";
+
+      // Yritetään ladata kuva dynaamisesti
+      try {
+        const timestamp = new Date().getTime();
+        const imageResponse = await fetch(
+          `/recipeRoute/recipe/${recipe.id}/image?t=${timestamp}`
+        );
+
+        if (imageResponse.ok) {
+          img.src = `/recipeRoute/recipe/${recipe.id}/image?t=${timestamp}`;
+        } else {
+          console.warn(
+            `Image not found for recipe ID ${recipe.id}, using default.`
+          );
+        }
+      } catch (error) {
+        console.warn(`Error fetching image for recipe ID ${recipe.id}:`, error);
+      }
 
       const title = document.createElement("h2");
-      title.textContent = recipe.title; // ✅ Muutettu "name" → "title"
+      title.textContent = recipe.title;
 
       const author = document.createElement("p");
-      author.textContent = `By: ${recipe.author_id || "Unknown"}`; // 🛠️ Näytetään author_id, koska "author" puuttuu
+      author.textContent = `By: ${recipe.author_id || "Unknown"}`;
 
       article.appendChild(img);
       article.appendChild(title);

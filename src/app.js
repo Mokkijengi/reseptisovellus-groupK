@@ -26,6 +26,12 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
+app.use("/src/images", express.static(path.join(__dirname, "images")));
+app.use(
+  "/src/images/default.jpg",
+  express.static(path.join(__dirname, "images/default.jpg"))
+);
+
 // Serve Static Files from the 'utils' directory
 app.use("/src/utils", express.static(path.join(__dirname, "utils")));
 app.use(
@@ -82,5 +88,7 @@ module.exports = app;
 // Start the server only if not in a testing environment
 if (process.env.NODE_ENV !== "test") {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+  app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}`)
+  );
 }
