@@ -41,6 +41,65 @@ router.get("/recipe/:id", async (req, res) => {
   }
 });
 
+// Hae kirjautuneen käyttäjän omat reseptit
+router.get("/my-recipes", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID missing in token!" });
+    }
+
+    const rows = await executeSQL("SELECT * FROM recipes WHERE author_id = ?", [
+      userId,
+    ]);
+
+    console.log(`🔹 Käyttäjän ${userId} reseptit haettu!`);
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching user recipes:", err);
+    res.status(500).json({ error: "Failed to fetch user recipes!" });
+  }
+});
+
+// Lisäys
+router.post(
+  "/recipes",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    const { title, ingredients, instructions, keywords, is_private } = req.body;
+    const author_id = req.user.userId;
+    const image = req.file ? req.file.buffer : null;
+
+    if (!author_id || !title || !ingredients || !instructions) {
+      return res.status(400).json({
+        error: "Author ID, title, ingredients, and instructions are required!",
+      });
+    }
+
+    try {
+      const result = await executeSQL(
+        "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [
+          author_id,
+          title,
+          ingredients,
+          instructions,
+          image,
+          keywords || null,
+          is_private !== undefined ? is_private : 0,
+        ]
+      );
+
+      res.status(201).json({ success: true, id: result.insertId });
+    } catch (err) {
+      console.error("Database error:", err);
+      res.status(500).json({ error: "Failed to create recipe!" });
+    }
+  }
+);
+
 // Lisää uusi resepti, pakolliset kentät: author_id, title, ingredients, instructions
 router.post("/recipes", async (req, res) => {
   const {
@@ -58,11 +117,9 @@ router.post("/recipes", async (req, res) => {
   // Tarkistetaan, että pakolliset kentät ovat mukana
   if (!author_id || !title || !ingredients || !instructions) {
     console.error("Error: Missing required fields");
-    return res
-      .status(400)
-      .json({
-        error: "Author ID, title, ingredients, and instructions are required!",
-      });
+    return res.status(400).json({
+      error: "Author ID, title, ingredients, and instructions are required!",
+    });
   }
 
   // Asetetaan oletusarvot valinnaisille kentille, jos niitä ei ole annettu
@@ -116,13 +173,44 @@ router.put(
     }
 
     try {
-      const fields = Object.keys(updates)
-        .map((key) => `${key} = ?`)
-        .join(", ");
-      const values = Object.values(updates);
+      let existingImage = null;
+      if (!image) {
+        const existing = await executeSQL(
+          "SELECT image_url FROM recipes WHERE id = ?",
+          [id]
+        );
+        if (existing.length > 0) {
+          existingImage = existing[0].image_url;
+        }
+      }
 
-      const [result] = await executeSQL(
-        `UPDATE recipes SET ${fields} WHERE id = ?`,
+      const fields = [];
+      const values = [];
+
+      if (title) {
+        fields.push("title = ?");
+        values.push(title);
+      }
+      if (ingredients) {
+        fields.push("ingredients = ?");
+        values.push(ingredients);
+      }
+      if (instructions) {
+        fields.push("instructions = ?");
+        values.push(instructions);
+      }
+      if (keywords !== undefined) {
+        // Tarkistetaan, että keywords on annettu (voi olla tyhjä)
+        fields.push("keywords = ?");
+        values.push(keywords);
+      }
+      if (image || existingImage) {
+        fields.push("image_url = ?");
+        values.push(image || existingImage);
+      }
+
+      const result = await executeSQL(
+        `UPDATE recipes SET ${fields.join(", ")} WHERE id = ?`,
         [...values, id]
       );
 
