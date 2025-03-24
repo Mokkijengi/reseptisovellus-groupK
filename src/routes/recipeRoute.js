@@ -41,52 +41,56 @@ router.get("/recipe/:id", async (req, res) => {
   }
 });
 
-// Hae kirjautuneen käyttäjän omat reseptit
-router.get("/my-recipes", verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.userId;
+// Lisää uusi resepti, pakolliset kentät: author_id, title, ingredients, instructions
+router.post("/recipes", async (req, res) => {
+  const {
+    author_id,
+    title,
+    ingredients,
+    instructions,
+    image_url,
+    keywords,
+    is_private,
+  } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: "User ID missing in token!" });
-    }
+  console.log("Received new recipe:", req.body); // Debug-loki
 
-    const rows = await executeSQL(
-      "SELECT * FROM recipes WHERE author_id = ?",
-      [userId]
-    );
-
-    console.log(`🔹 Käyttäjän ${userId} reseptit haettu!`);
-    res.json(rows);
-  } catch (err) {
-    console.error("Error fetching user recipes:", err);
-    res.status(500).json({ error: "Failed to fetch user recipes!" });
-  }
-});
-
-
-// Lisäys
-router.post("/recipes", verifyToken, upload.single("image"), async (req, res) => {
-  const { title, ingredients, instructions, keywords, is_private } = req.body;
-  const author_id = req.user.userId;
-  const image = req.file ? req.file.buffer : null;
-
+  // Tarkistetaan, että pakolliset kentät ovat mukana
   if (!author_id || !title || !ingredients || !instructions) {
-    return res.status(400).json({
-      error: "Author ID, title, ingredients, and instructions are required!",
-    });
+    console.error("Error: Missing required fields");
+    return res
+      .status(400)
+      .json({
+        error: "Author ID, title, ingredients, and instructions are required!",
+      });
   }
 
+  // Asetetaan oletusarvot valinnaisille kentille, jos niitä ei ole annettu
+  const finalImageUrl = image_url || null; // Voi olla NULL
+  const finalKeywords = keywords || null; // Voi olla NULL
+  const finalIsPrivate = is_private !== undefined ? is_private : 0; // Oletus julkinen (0)
+
+  console.log("Inserting with values:", {
+    author_id,
+    title,
+    ingredients,
+    instructions,
+    finalImageUrl,
+    finalKeywords,
+    finalIsPrivate,
+  });
+
   try {
-    const result = await executeSQL(
+    const [result] = await executeSQL(
       "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         author_id,
         title,
         ingredients,
         instructions,
-        image,
-        keywords || null,
-        is_private !== undefined ? is_private : 0,
+        finalImageUrl,
+        finalKeywords,
+        finalIsPrivate,
       ]
     );
 
@@ -97,66 +101,42 @@ router.post("/recipes", verifyToken, upload.single("image"), async (req, res) =>
   }
 });
 
-
 // Muokkaus
-router.put("/recipes/:id", verifyToken, upload.single("image"), async (req, res) => {
-  const { id } = req.params;
-  const { title, ingredients, instructions, keywords } = req.body;
-  const image = req.file ? req.file.buffer : null;
+router.put(
+  "/recipes/:id",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    const { id } = req.params;
+    const { title, ingredients, instructions, keywords } = req.body;
+    const image = req.file ? req.file.buffer : null;
 
-  if (!title && !ingredients && !instructions && !image && !keywords) {
-    return res.status(400).json({ error: "No fields to update!" });
-  }
+    if (!title && !ingredients && !instructions && !image && !keywords) {
+      return res.status(400).json({ error: "No fields to update!" });
+    }
 
-  try {
-    let existingImage = null;
-    if (!image) {
-      const existing = await executeSQL("SELECT image_url FROM recipes WHERE id = ?", [id]);
-      if (existing.length > 0) {
-        existingImage = existing[0].image_url;
+    try {
+      const fields = Object.keys(updates)
+        .map((key) => `${key} = ?`)
+        .join(", ");
+      const values = Object.values(updates);
+
+      const [result] = await executeSQL(
+        `UPDATE recipes SET ${fields} WHERE id = ?`,
+        [...values, id]
+      );
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Recipe not found!" });
       }
-    }
 
-    const fields = [];
-    const values = [];
-
-    if (title) {
-      fields.push("title = ?");
-      values.push(title);
+      res.json({ success: true, message: "Recipe updated successfully!" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to update recipe!" });
     }
-    if (ingredients) {
-      fields.push("ingredients = ?");
-      values.push(ingredients);
-    }
-    if (instructions) {
-      fields.push("instructions = ?");
-      values.push(instructions);
-    }
-    if (keywords !== undefined) { // Tarkistetaan, että keywords on annettu (voi olla tyhjä)
-      fields.push("keywords = ?");
-      values.push(keywords);
-    }
-    if (image || existingImage) {
-      fields.push("image_url = ?");
-      values.push(image || existingImage);
-    }
-
-    const result = await executeSQL(
-      `UPDATE recipes SET ${fields.join(", ")} WHERE id = ?`,
-      [...values, id]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Recipe not found!" });
-    }
-
-    res.json({ success: true, message: "Recipe updated successfully!" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to update recipe!" });
   }
-});
-
+);
 
 // Poista resepti
 router.delete("/recipes/:id", async (req, res) => {
@@ -176,13 +156,15 @@ router.delete("/recipes/:id", async (req, res) => {
   }
 });
 
-
 // Palauta reseptin kuva erillisenä pyyntönä
 router.get("/recipe/:id/image", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const rows = await executeSQL("SELECT image_url FROM recipes WHERE id = ?", [id]);
+    const rows = await executeSQL(
+      "SELECT image_url FROM recipes WHERE id = ?",
+      [id]
+    );
 
     if (!rows || rows.length === 0 || !rows[0].image_url) {
       return res.status(404).send("Image not found");
