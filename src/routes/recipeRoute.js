@@ -122,32 +122,17 @@ router.post("/recipes", async (req, res) => {
     });
   }
 
-  // Asetetaan oletusarvot valinnaisille kentille, jos niitä ei ole annettu
-  const finalImageUrl = image_url || null; // Voi olla NULL
-  const finalKeywords = keywords || null; // Voi olla NULL
-  const finalIsPrivate = is_private !== undefined ? is_private : 0; // Oletus julkinen (0)
-
-  console.log("Inserting with values:", {
-    author_id,
-    title,
-    ingredients,
-    instructions,
-    finalImageUrl,
-    finalKeywords,
-    finalIsPrivate,
-  });
-
   try {
-    const [result] = await executeSQL(
+    const result = await executeSQL(
       "INSERT INTO recipes (author_id, title, ingredients, instructions, image_url, keywords, is_private) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         author_id,
         title,
         ingredients,
         instructions,
-        finalImageUrl,
-        finalKeywords,
-        finalIsPrivate,
+        image,
+        keywords || null,
+        is_private !== undefined ? is_private : 0,
       ]
     );
 
