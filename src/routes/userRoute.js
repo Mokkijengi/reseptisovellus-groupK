@@ -1,4 +1,3 @@
-//for registering new user
 const express = require("express");
 const {
   registerUser,
@@ -11,18 +10,20 @@ const {
   getSingleUser,
 } = require("../controllers/userController"); // Import controllers
 
-const router = express.Router(); // Luo uusi reititin käyttäjäpoluille
-router.post("/register", registerUser); // Uuden käyttäjän rekisteröinti
-router.post("/login", loginUser); // Käyttäjän kirjautuminen
-router.get("/users", getAllUsers); // Hakee kaikki käyttäjät
-router.get("/user", getUser); // Hakee yksittäisen käyttäjän tiedot
+const verifyToken = require("../routes/protectedRoute"); // Lisätty autentikointivarmistus
+
+const router = express.Router();
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/users", getAllUsers);
+router.get("/user", getUser);
+router.post("/refreshToken", refreshToken);
+router.put("/users/:id", editUser);
 router.get("/users/:id", getSingleUser); // Hakee yksittäisen käyttäjän tiedot idllä
-router.post("/refreshToken", refreshToken); // Tokenin uusiminen
 
-router.post("/login", loginUser); //logs user
+router.delete("/users/:id", deleteUser);
 
-router.put("/users/:id", editUser); // Lisää tämä, jos puuttuu
+// Lisätty reitti hakemaan kirjautuneen käyttäjän tiedot tokenin avulla
+router.get("/me", verifyToken, getUser);
 
-router.delete("/users/:id", deleteUser); //delete user
-
-module.exports = router; //export the router
+module.exports = router;
