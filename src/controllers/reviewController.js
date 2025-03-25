@@ -27,15 +27,24 @@ const addReview = async (req, res) => {
   }
 };
 
+// ⭐ HAE ARVOSTELUT (NYT SISÄLTÄÄ KOMMENTIT & KÄYTTÄJÄNIMEN)
 const getReviewsByRecipe = async (req, res) => {
   try {
     const recipeId = req.params.recipeId;
-    const reviews = await executeSQL("SELECT rating FROM reviews WHERE recipe_id = ?", [recipeId]);
+
+    // Haetaan arvostelut, mukaan lukien käyttäjänimi (jos mahdollista)
+    const reviews = await executeSQL(
+      `SELECT r.rating, r.comment, u.username 
+       FROM reviews r
+       JOIN users u ON r.user_id = u.id
+       WHERE r.recipe_id = ?`,
+      [recipeId]
+    );
 
     res.json(reviews);
   } catch (error) {
     console.error("Error fetching reviews:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 

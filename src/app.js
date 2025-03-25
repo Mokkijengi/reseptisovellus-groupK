@@ -8,6 +8,8 @@ const path = require("path"); //liittyy Modal-komponenttiin
 
 app.use(express.json());
 
+app.use("/favorites", require("./routes/favoriteRoute"));
+
 app.use("/protected", require("./routes/protectedRoute")); //tokenin tarkistus, lisätty 16.2. AINO
 
 app.use("/recipeRoute", require("./routes/recipeRoute"));
@@ -49,7 +51,7 @@ app.use("/css", express.static(__dirname + "/views/css"));
 app.use("/js", express.static(__dirname + "/views/js"));
 
 //app.use("/emailRoute", require("./routes/emailRoute"));
-//app.use("/reviewRoute", require("./routes/reviewRoute"));
+app.use("/reviewRoute", require("./routes/reviewRoute"));
 
 // HTML-tiedostojen tarjoaminen
 app.get("/", (req, res) => {
