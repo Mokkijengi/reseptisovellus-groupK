@@ -179,6 +179,22 @@ const getUser = async (req, res) => {
   }
 };
 
+const getSingleUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await executeSQL("SELECT * FROM users WHERE id = ?", [id]);
+
+    if (!user || user.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user[0]); // Send the first matching user
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // Refresh token if expired
 const refreshToken = async (req, res) => {
   const oldToken = req.headers.authorization?.split(" ")[1];
@@ -214,4 +230,5 @@ module.exports = {
   editUser,
   getUser,
   refreshToken,
+  getSingleUser,
 };
