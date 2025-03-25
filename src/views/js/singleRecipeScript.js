@@ -17,18 +17,47 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   try {
     // Haetaan reseptin tiedot
-    const response = await fetch(`/recipeRoute/recipe/${encodeURIComponent(recipeId)}`);
-    if (!response.ok) throw new Error(`Error fetching recipe: ${response.status}`);
+    const response = await fetch(
+      `/recipeRoute/recipe/${encodeURIComponent(recipeId)}`
+    );
+    if (!response.ok)
+      throw new Error(`Error fetching recipe: ${response.status}`);
     const recipe = await response.json();
 
     document.getElementById("recipe-title").textContent = recipe.title;
-    document.getElementById("recipe-image").src = recipe.image_url || "images/default.jpg";
-    document.getElementById("recipe-description").textContent = recipe.description;
-    document.getElementById("recipe-author").textContent = `By: ${recipe.author || "Unknown"}`;
+
+    const img = document.getElementById("recipe-image");
+    img.src = "src/images/default.jpg";
+
+    try {
+      const timestamp = new Date().getTime();
+      const imageResponse = await fetch(
+        `/recipeRoute/recipe/${recipe.id}/image?t=${timestamp}`
+      );
+
+      if (imageResponse.ok) {
+        img.src = `/recipeRoute/recipe/${recipe.id}/image?t=${timestamp}`;
+      } else {
+        console.warn(
+          `Image not found for recipe ID ${recipe.id}, using default.`
+        );
+      }
+    } catch (error) {
+      console.warn(`Error fetching image for recipe ID ${recipe.id}:`, error);
+    }
+
+    document.getElementById("recipe-description").textContent =
+      recipe.description;
+    document.getElementById("recipe-author").textContent = `By: ${
+      recipe.author || "Unknown"
+    }`;
 
     const ingredientsList = document.getElementById("ingredients-list");
     ingredientsList.innerHTML = "";
-    (Array.isArray(recipe.ingredients) ? recipe.ingredients : recipe.ingredients.split(",")).forEach((ingredient) => {
+    (Array.isArray(recipe.ingredients)
+      ? recipe.ingredients
+      : recipe.ingredients.split(",")
+    ).forEach((ingredient) => {
       const li = document.createElement("li");
       li.textContent = ingredient;
       ingredientsList.appendChild(li);
@@ -36,7 +65,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const instructionsList = document.getElementById("instructions-list");
     instructionsList.innerHTML = "";
-    (Array.isArray(recipe.instructions) ? recipe.instructions : recipe.instructions.split(",")).forEach((step) => {
+    (Array.isArray(recipe.instructions)
+      ? recipe.instructions
+      : recipe.instructions.split(",")
+    ).forEach((step) => {
       const li = document.createElement("li");
       li.textContent = step;
       instructionsList.appendChild(li);
@@ -50,30 +82,34 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   //lähetä resepti kaverille emaililla
   // Handle the Send Recipe via Email functionality
-  document.getElementById('send-recipe-form').addEventListener('submit', function(e) {
-    e.preventDefault();  // Prevent form submission
+  document
+    .getElementById("send-recipe-form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault(); // Prevent form submission
 
-    const recipientEmail = document.getElementById('email').value;
+      const recipientEmail = document.getElementById("email").value;
 
-    // Simple email validation
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailPattern.test(recipientEmail)) {
-      alert('Please enter a valid email address.');
-      return;
-    }
+      // Simple email validation
+      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      if (!emailPattern.test(recipientEmail)) {
+        alert("Please enter a valid email address.");
+        return;
+      }
 
-    // Get the current page URL (this should be the recipe page link)
-    const recipeLink = window.location.href;  // Automatically gets the current URL (e.g., recipe page)
+      // Get the current page URL (this should be the recipe page link)
+      const recipeLink = window.location.href; // Automatically gets the current URL (e.g., recipe page)
 
-    const subject = 'Check out this awesome recipe!';
-    const body = `Hey! I found this awesome recipe and thought you’d like it. Here’s the link: ${recipeLink}`;
+      const subject = "Check out this awesome recipe!";
+      const body = `Hey! I found this awesome recipe and thought you’d like it. Here’s the link: ${recipeLink}`;
 
-    // Create the mailto link
-    const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      // Create the mailto link
+      const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(
+        subject
+      )}&body=${encodeURIComponent(body)}`;
 
-    // Open the default email client with the pre-filled email
-    window.location.href = mailtoLink;
-  });
+      // Open the default email client with the pre-filled email
+      window.location.href = mailtoLink;
+    });
 });
 
 // ⭐ TÄHTI-ARVOSTELUN TALLENNUS
