@@ -28,11 +28,6 @@
     "resend": "^4.1.2"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "supertest": "^7.1.0"
-  },
-  "devDependencies": {
     "cross-env": "^7.0.3",
     "jest": "^29.7.0",
     "supertest": "^7.1.0"
