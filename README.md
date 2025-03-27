@@ -1,22 +1,10 @@
-Ehdotus rakenteelle
-// root/
-// ├── src/
-// │ ├── controllers/ // API-logiikka
-// │ ├── routes/ // Reittimäärittelyt
-// │ ├── models/ // Tietokantamallit
-// │ ├── config/ // Konfiguraatiotiedostot (esim. tietokantakonfiguraatio)
-// │ └── app.js // Sovelluksen pääsisäänkäynti
-// ├── views/ // Sivut (esim. EJS-mallit)
-// ├── tests/ // Yksikkö- ja integraatiotestit
-// ├── .env // Ympäristömuuttujat kuten salasanahommat yms
-// ├── package.json // Node-riippuvuudet
-// └── README.md // Projektin dokumentaatio
-
 # Introduction
 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.
+Projektin tavoitteena oli kehittää selainpohjainen reseptienhallintasovellus, joka mahdollistaa käyttäjien kirjautumisen, reseptien lisäämisen, muokkaamisen, jakamisen, sekä ainesosien hallinnan. Lähtötilanteessa ei ollut käytettävissä olemassa olevaa järjestelmää, ja projektilla pyrittiin luomaan käyttäjäystävällinen, modernilla teknologialla toteutettu ratkaisu ruoanlaitosta kiinnostuneille henkilöille.
 
 # Getting Started
+
+Komentokehoitteeseen sovelluksen juuressa npm install
 
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
 
@@ -27,7 +15,7 @@ TODO: Guide users through getting your code up and running on their own system. 
 
 # Build and Test
 
-TODO: Describe and show how to build your code and run the tests.
+Käynnistyy komennolla src -kansiossa node app.js
 
 # Contribute
 
