@@ -150,6 +150,7 @@ document.querySelectorAll("#star-rating .star").forEach((star) => {
 });
 
 // 🔥 HAE JA NÄYTÄ ARVOSTELUJEN KOOSTE
+// 🔥 HAE JA NÄYTÄ ARVOSTELUJEN KOOSTE JA KOMMENTIT
 async function displayReviews(recipeId) {
   try {
     const response = await fetch(`/reviewRoute/reviews/${recipeId}`);
@@ -157,10 +158,15 @@ async function displayReviews(recipeId) {
 
     const reviews = await response.json();
     const reviewContainer = document.getElementById("review-summary");
-    reviewContainer.innerHTML = "";
+    reviewContainer.innerHTML = "<h2>Recipe Ratings & Reviews</h2>";
 
-    const totalReviews = reviews.length;
-    const ratings = [0, 0, 0, 0, 0];
+    if (reviews.length === 0) {
+      reviewContainer.innerHTML += "<p>No reviews yet. Be the first to review!</p>";
+      return;
+    }
+
+    let totalReviews = reviews.length;
+    let ratings = [0, 0, 0, 0, 0];
 
     reviews.forEach((review) => {
       ratings[review.rating - 1]++;
@@ -180,26 +186,58 @@ async function displayReviews(recipeId) {
         </div>
       `;
     });
+
+    // ⭐ Näytetään jokaisen käyttäjän arvostelu ja kommentti
+    reviewContainer.innerHTML += `<h3>User Reviews</h3>`;
+    reviews.forEach((review) => {
+      reviewContainer.innerHTML += `
+        <div class="review-comment">
+          <p><strong>${review.username || "Anonymous"}:</strong> ★${review.rating}</p>
+          <p>${review.comment}</p>
+        </div>
+      `;
+    });
+
   } catch (error) {
     console.error("Error fetching reviews:", error);
   }
 }
 
-// ❤️ SUOSIKKI-NAPPULA
+// ❤️ SUOSIKKI-NAPPULA (Tietokantatallennuksella)
 const favoriteButton = document.getElementById("favoriteButton");
 const favoriteMessage = document.getElementById("favoriteMessage");
-favoriteButton.addEventListener("click", function () {
-  const params = new URLSearchParams(window.location.search);
-  const recipeName = document.getElementById("recipe-title").textContent;
-  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-  if (!favorites.includes(recipeName)) {
-    favorites.push(recipeName);
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-    favoriteMessage.style.display = "block";
-    setTimeout(() => (favoriteMessage.style.display = "none"), 2000);
-  } else {
-    alert("This recipe is already in your favorites!");
+favoriteButton.addEventListener("click", async function () {
+  const token = localStorage.getItem("token"); // Haetaan käyttäjän token
+  if (!token) {
+    alert("You must be logged in to add favorites.");
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const recipeId = params.get("id"); // Haetaan reseptin ID URL-parametreista
+
+  try {
+    const response = await fetch("http://localhost:3000/favorites/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Lähetetään käyttäjän token
+      },
+      body: JSON.stringify({ recipeId }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      favoriteMessage.style.display = "block";
+      setTimeout(() => (favoriteMessage.style.display = "none"), 2000);
+    } else {
+      alert(result.message || "Failed to add to favorites.");
+    }
+  } catch (error) {
+    console.error("Error adding favorite:", error);
+    alert("An error occurred while adding to favorites.");
   }
 });
 

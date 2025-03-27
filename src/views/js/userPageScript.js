@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const addRecipeButton = document.getElementById("add-recipe-btn");
   const logoutButton = document.getElementById("logoutButton");
   const modal = document.getElementById("customModal");
+  const favoriteTable = document.getElementById("favorite-recipes-table");// tämä
 
   let ownRecipes = [];
   let userId = null;
@@ -337,7 +338,75 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Lisätään tapahtumakuuntelija uuden reseptin lisäämiselle
   addRecipeButton.addEventListener("click", addRecipe);
   await fetchUser(); // Haetaan käyttäjän tiedot ja reseptit heti alussa
+
+  // Haetaan käyttäjän suosikit
+  async function fetchFavorites() {
+    try {
+      const response = await fetch("/favorites/my-favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch favorites");
+
+      const favorites = await response.json();
+
+      if (favorites.length === 0) {
+        favoriteTable.innerHTML = "<tr><td colspan='2'>No favorites yet.</td></tr>";
+        return;
+      }
+
+      favoriteTable.innerHTML = ""; // Tyhjennetään vanha sisältö
+
+      favorites.forEach((recipe) => {
+        const row = document.createElement("tr");
+
+        // Reseptin nimi ja linkki reseptisivulle
+        const recipeCell = document.createElement("td");
+        const link = document.createElement("a");
+        link.href = `/singleRecipe.html?id=${recipe.id}`;
+        link.textContent = recipe.title;
+        recipeCell.appendChild(link);
+        row.appendChild(recipeCell);
+
+        // Poista suosikeista -painike
+        const removeCell = document.createElement("td");
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.classList.add("button");
+        removeButton.onclick = () => removeFavorite(recipe.id, row);
+        removeCell.appendChild(removeButton);
+        row.appendChild(removeCell);
+
+        favoriteTable.appendChild(row);
+      });
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
+  }
+
+  // Poista suosikki
+  async function removeFavorite(recipeId, row) {
+    try {
+      const response = await fetch("/favorites/remove", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ recipeId }),
+      });
+
+      if (!response.ok) throw new Error("Failed to remove favorite");
+
+      row.remove(); // Poistetaan rivi UI:sta
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+    }
+  }
+
+  await fetchFavorites(); // Haetaan suosikit heti alussa
 });
+
 
 function goToRecipePage() {
   window.location.href = "/recipePage.html";
